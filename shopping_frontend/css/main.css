@@ -1,0 +1,30 @@
+*{
+    box-sizing: inherit;
+}
+
+html{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.card-course-item {
+    margin-top: 16px;
+}
+
+#postClothes{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.checkbox-select-all-options{
+    width: 170px;
+    margin: 0 8px;
+}

@@ -12,7 +12,8 @@ html{
     margin-top: 16px;
 }
 
-#postClothes{
+#postClothes,
+#detailClothes{
     display: flex;
     flex-wrap: wrap;
 }

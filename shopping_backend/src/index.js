@@ -6,7 +6,7 @@ const app = express();
 const port = 3000
 
 //Route init
-const route = require('./routes/index.route');
+const baseRouter = require('./routes/index.route');
 
 //MongoDB
 const db = require('./config/db/index.db');
@@ -21,9 +21,20 @@ app.use(cors())
 
 //Static file
 app.use(express.static(path.join(__dirname, '../../shopping_frontend/assets')));
+
+//middelware dung de xu ly du lieu tu form submit len
+app.use(
+    express.urlencoded({
+        extended: true,
+    }),
+);
+
+//su dung thu vien js hay code js de submit
+app.use(express.json());
+
 //Routes init
-route(app);
+app.use('/api', baseRouter);
 
 app.listen(port, () => { 
-    console.log(`App listening at http://localhost:${port}/clothes`); 
+    console.log(`App listening at http://localhost:${port}`);
 });

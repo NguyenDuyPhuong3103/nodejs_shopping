@@ -1,12 +1,12 @@
 //import collection (Course) in mongoDB compass => Course export model (Schema)
-const Clothes = require('../models/Clothes');
+const Clothes = require('../models/Products');
 
 class SiteController {
 
     //[GET] /
     index(req, res, next) {
         Clothes.find({})
-            .then(clothess => res.json(clothess))
+            .then(clothes => res.json(clothes))
             .catch(next);
     }
 

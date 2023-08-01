@@ -10,21 +10,21 @@ function getParameterByName(name, url) {
 
 var URL = getParameterByName('id', window.location.href);
 
-var postApi ='http://localhost:3000/clothes/' + URL;
+var postApi ='http://localhost:3000/api/products/' + URL;
 fetch(postApi)
     .then(response => response.json())
-    .then(cloth => {
-        htmls = `
+    .then(product => {
+        var html = `
             <div class="col-lg-3">
                 <button>BUY NOW</button>
             </div>
             <div class="col-lg-9">
-                <h2>${cloth.name}</h2>
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/${cloth.videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                <p>${cloth.description}</p>
+                <h2>${product.name}</h2>
+                <img class="details-img" src="${product.image}" alt="${product.name}">
+                <p>${product.description}</p>
             </div>
             `
-        document.getElementById('detailClothes').innerHTML = htmls;
+        document.getElementById('detailsProducts').innerHTML = html;
     })
     .catch(function(error){
         alert('Have a mistake!!!')

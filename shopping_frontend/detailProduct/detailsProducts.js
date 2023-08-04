@@ -15,15 +15,18 @@ fetch(postApi)
     .then(response => response.json())
     .then(product => {
         var html = `
-            <div class="col-lg-3">
-                <button>BUY NOW</button>
-            </div>
-            <div class="col-lg-9">
-                <h2>${product.name}</h2>
+        <div>
+            <h2>${product.name}</h2>
+            <center>
                 <img class="details-img" src="${product.image}" alt="${product.name}">
-                <p>${product.description}</p>
-            </div>
-            `
+            </center>
+            <p>${product.description}</p>
+        </div>
+        <div class="detailsPrice">
+            <h3 class="mr-4">${product.price}</h3>
+            <button>BUY NOW</button>
+        </div>
+        `
         document.getElementById('detailsProducts').innerHTML = html;
     })
     .catch(function(error){

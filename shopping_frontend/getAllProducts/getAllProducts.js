@@ -1,6 +1,6 @@
-var postApi ='http://localhost:3000/api/products';
+var AllProductsApi ='http://localhost:3000/api/products';
 
-fetch(postApi)
+fetch(AllProductsApi)
     .then(response => response.json())
     .then(products => {
         var htmls = products.map(function(product){
@@ -14,7 +14,6 @@ fetch(postApi)
                                 <a href="../detailProduct/detailsProducts.html?id=${product._id}">
                                     <h5 class="card-title">${product.name}</h5>
                                 </a>
-                                <p class="card-text">${product.description}</p>
                                 <a href="../detailProduct/detailsProducts.html?id=${product._id}" class="btn btn-primary">Details</a>
                             </div>
                         </div>

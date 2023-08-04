@@ -4,6 +4,7 @@ const Product = require('../models/Products');
 class ProductsController {
 
     //[GET] /products
+    //[GET] /products/AllPostedProducts
     getAllProducts(req, res, next){
         Product.find({})
             .then(products => res.json(products))
@@ -21,7 +22,20 @@ class ProductsController {
     createProduct(req, res, next) {
         Product.create(req.body)
             .then(result => res.json(result))
-            .catch(error => res.json(error));
+            .catch(next);
+    }
+
+    // [PUT] /products
+    editProductById(req, res, next) {
+        Product.updateOne({ _id: req.params.id}, {
+            name: req.body.name,
+            image: req.body.image,
+            description: req.body.description,
+            classification: req.body.classification,
+            price: req.body.price,
+        })
+            .then(product => res.json(product))
+            .catch(next); 
     }
 
     // [DELETE] /products

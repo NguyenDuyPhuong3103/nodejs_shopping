@@ -1,3 +1,10 @@
 .details-img{
-    width: 50%;
+    width: 30%;
+    display: block;
+}
+
+.detailsPrice{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

@@ -5,11 +5,15 @@ $('#deleteProduct').on('submit', (event) => {
     var name = $('input[name = "name"]').val();
     var image = $('input[name = "image"]').val();
     var description = $('input[name = "description"]').val();
+    var classification = $('input[name = "classification"]').val();
+    var price = $('input[name = "price"]').val();
 
     var newProduct = {
         name: name,
         image: image,
-        description: description
+        description: description,
+        classification: classification,
+        price: price
     }
     deleteProduct(newProduct);
 })

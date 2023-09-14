@@ -1,11 +1,5 @@
-*{
-    box-sizing: inherit;
-}
-
-html{
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+.navbar{
+    height: 64px;
 }
 
 .card-course-item {
@@ -28,4 +22,9 @@ html{
 .checkbox-select-all-options{
     width: 170px;
     margin: 0 8px;
+}
+
+.logo-img{
+    width: 28px;
+    height: 28px;
 }

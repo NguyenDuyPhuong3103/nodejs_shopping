@@ -25,5 +25,5 @@ fetch(AllProductsApi)
         document.getElementById('getAllProducts').innerHTML = html;
     })
     .catch(function(error){
-        alert('Have a mistake!!!')
+        alert('Sai roi con chó à ')
     });

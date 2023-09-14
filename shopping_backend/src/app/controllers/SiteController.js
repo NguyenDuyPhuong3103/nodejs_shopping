@@ -1,5 +1,5 @@
 //import collection (Course) in mongoDB compass => Course export model (Schema)
-const Clothes = require('../models/Products');
+const Clothes = require('../models/Products.model');
 
 class SiteController {
 
@@ -11,7 +11,7 @@ class SiteController {
     }
 
     //[GET] /search
-    search(req, res) {
+    search(req, res, next) {
         res.send('search');
     }
 

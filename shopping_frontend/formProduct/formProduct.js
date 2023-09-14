@@ -14,7 +14,7 @@ var idApi ='http://localhost:3000/api/products/' + URL;
 
 var productApi ='http://localhost:3000/api/products';
 
-var createURL = 'http://127.0.0.1:5500/shopping_frontend/formProduct/formProduct.html?id=' + URL;
+var createURL = 'http://127.0.0.1:5501/shopping_frontend/formProduct/formProduct.html?id=' + URL;
 
 if (window.location.href == createURL) {
     fetch(idApi)
@@ -52,7 +52,7 @@ if (window.location.href == createURL) {
                     <button type="submit" class="btn btn-primary">Save item</button>
                 </form>
             `;
-            document.getElementById('formProduct').innerHTML = htmlEditProduct;
+            $('#formProduct').html(htmlEditProduct);
 
             // Set up the form submission event listener
             $('#editProduct').on('submit', (event) => {
@@ -97,7 +97,7 @@ function editProduct(productId, data) {
             return response.json();
         })
         .then(data => {
-            const newPageURL = '../getAllProducts/getAllProducts.html';
+            const newPageURL = '../index.html';
             window.location.href = newPageURL;
         })
         .catch(error => {
@@ -143,7 +143,7 @@ else
                     <button type="submit" class="btn btn-primary">Create item</button>
                 </form>
             `
-            document.getElementById('formProduct').innerHTML = htmlCreateProduct;
+            $('#formProduct').html(htmlCreateProduct);
 
             // Set up the form submission event listener
             $('#createProduct').on('submit', (event) => {

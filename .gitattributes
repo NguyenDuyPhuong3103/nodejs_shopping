@@ -1,0 +1,5 @@
+# Đặt xuống dòng (line endings) mặc định cho tất cả các tệp văn bản là LF
+* text=auto
+
+# Đặt xuống dòng (line endings) cho một số tệp cụ thể là CRLF
+*.txt text eol=crlf

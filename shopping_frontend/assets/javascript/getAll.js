@@ -76,8 +76,8 @@ const btn_getAll = $('#getAll');
 if (btn_getAll) {
     btn_getAll.on('click', async (event) => {
         event.preventDefault();
-        const { meta, data  } = await refreshToken();
-        console.log(data);
+        const result = await refreshToken();
+        console.log(result);
     });
 }
 
@@ -104,11 +104,11 @@ async function refreshToken() {
     // console.log(refreshTokenValue)
     // return refreshTokenValue;
     // return (await instance.get('user/refresh-token')).data;
-    const refreshTokenValue = await fetch('http://localhost:3000/api/user/refresh-token', {
+    const result = await fetch('http://localhost:3000/api/user/refresh-token', {
         method: 'GET',
     });
-    console.log(refreshTokenValue)
-    return refreshTokenValue;
+    console.log(result)
+    return result.data;
 }
 
 async function getNewRef() {

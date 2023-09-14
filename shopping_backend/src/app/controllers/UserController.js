@@ -125,50 +125,51 @@ class UserController {
         2./ Create new access token and new refresh token
         */
     async refreshToken(req, res, next) {
-        try {
-            const refreshToken = req.cookies.refreshToken;
-            console.log(req.cookies);
-            if (!refreshToken){
-                return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { 
-                    message: `Khong tim thay refreshToken trong cookie o server!!` 
-                })).end();
-            }
+        // try {
+        //     const refreshToken = req.cookies.refreshToken;
+        //     console.log(req.cookies);
+        //     if (!refreshToken){
+        //         return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { 
+        //             message: `Khong tim thay refreshToken trong cookie o server!!` 
+        //         })).end();
+        //     }
 
-            const {userId} = await verifyRefreshToken(refreshToken);
+        //     const {userId} = await verifyRefreshToken(refreshToken);
             
-            const findToken = await RefreshTokenModel.findOne({token: refreshToken});
-            if (!findToken){
-                return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { 
-                    message: `refreshToken khong hop le!!` 
-                })).end();
-            } else {
-                const accessToken = await signAccessToken(userId);
-                const newRef = await signRefreshToken(userId);
-                let newRefreshToken = await RefreshTokenModel.findOneAndUpdate(
-                    {token: refreshToken},
-                    {token: newRef},
-                    {new: true}
-                );
+        //     const findToken = await RefreshTokenModel.findOne({token: refreshToken});
+        //     if (!findToken){
+        //         return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { 
+        //             message: `refreshToken khong hop le!!` 
+        //         })).end();
+        //     } else {
+        //         const accessToken = await signAccessToken(userId);
+        //         const newRef = await signRefreshToken(userId);
+        //         let newRefreshToken = await RefreshTokenModel.findOneAndUpdate(
+        //             {token: refreshToken},
+        //             {token: newRef},
+        //             {new: true}
+        //         );
 
-                res.cookie("refreshToken", newRef, {
-                    httpOnly:true,
-                    secure:false,
-                    path:"/",
-                    sameSite: "none",
-                })
+        //         res.cookie("refreshToken", newRef, {
+        //             httpOnly:true,
+        //             secure:false,
+        //             path:"/",
+        //             sameSite: "none",
+        //         })
 
-                return res.status(StatusCodes.OK).json(responseFormat(true, { 
-                    message: `Refresh Token thanh cong!!!`},{
-                        accessToken,
-                        timeExpired: Date.now() + (60 * 1000)
-                    })).end();
-            }
-        } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
-                message: `Co loi o server refreshToken`,
-                error: error, 
-            })).end();
-        }
+        //         return res.status(StatusCodes.OK).json(responseFormat(true, { 
+        //             message: `Refresh Token thanh cong!!!`},{
+        //                 accessToken,
+        //                 timeExpired: Date.now() + (60 * 1000)
+        //             })).end();
+        //     }
+        // } catch (error) {
+        //     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+        //         message: `Co loi o server refreshToken`,
+        //         error: error, 
+        //     })).end();
+        // }
+        return res.send(req.cookies.refreshToken);
     }
 
     //[DELETE] /logout

@@ -19,7 +19,6 @@ require('dotenv').config({ path: envFilePath });
 
 const PORT = process.env.PORT || 5000;
 
-
 // allow the app to use cookieparser
 app.use(helmet());
 

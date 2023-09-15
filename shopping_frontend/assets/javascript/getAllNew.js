@@ -13,31 +13,31 @@ instance.interceptors.request.use( async (config) => {
     console.log('truoc khi request:::');
     console.log(config.url)
 
-    //Chung ta khong can kiem tra accessToken voi 2 routes nay
-    if (config.url.includes('user/login') || config.url.includes('user/refresh-token') || config.url.includes('user/get-cookie')) {
-        return config;
-    }
+    // //Chung ta khong can kiem tra accessToken voi 2 routes nay
+    // if (config.url.includes('user/login') || config.url.includes('user/refresh-token') || config.url.includes('user/get-cookie')) {
+    //     return config;
+    // }
 
-    const {accessToken, timeExpired} = await instance.getCookieAccessToken();
-    console.log(`accessToken: ${accessToken} va timeExpired: ${timeExpired}`)
-    const now = new Date().getTime()
-    console.log(`timeExpired:::${timeExpired} vs now:::${now}`)
-    if (timeExpired < now) {
-        try {
-            console.log(`accessToken het han!!!`);
-            const { meta, data: {accessToken, timeExpired} } = await refreshToken();
-            console.log(meta.message);
-            console.log(accessToken);
-            if (meta.ok === true){
-                //set token vs timeExpired
-                await instance.setCookieAccessToken({accessToken, timeExpired});
-                console.log('dong 37:::', updateRef);
-                return config;
-            }
-        } catch (error) {
-            return Promise.reject(error)
-        }
-    }
+    // const {accessToken, timeExpired} = await instance.getCookieAccessToken();
+    // console.log(`accessToken: ${accessToken} va timeExpired: ${timeExpired}`)
+    // const now = new Date().getTime()
+    // console.log(`timeExpired:::${timeExpired} vs now:::${now}`)
+    // if (timeExpired < now) {
+    //     try {
+    //         console.log(`accessToken het han!!!`);
+    //         const { meta, data: {accessToken, timeExpired} } = await refreshToken();
+    //         console.log(meta.message);
+    //         console.log(accessToken);
+    //         if (meta.ok === true){
+    //             //set token vs timeExpired
+    //             await instance.setCookieAccessToken({accessToken, timeExpired});
+    //             console.log('dong 37:::', updateRef);
+    //             return config;
+    //         }
+    //     } catch (error) {
+    //         return Promise.reject(error)
+    //     }
+    // }
 
     return config;
 }, err => {
@@ -100,7 +100,7 @@ async function login() {
 }
 
 async function refreshToken() {
-    return (await instance.get('user/refresh-token')).data;
+    return (await instance.post('user/refresh-token')).data;
 }
 
 async function getNewRef() {

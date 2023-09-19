@@ -9,40 +9,42 @@ const instance = axios.create({
 
 
 // Xu ly data TRUOC khi gui request den server
-instance.interceptors.request.use( async (config) => {
-    console.log('truoc khi request:::');
-    console.log(config.url)
+// instance.interceptors.request.use( async (config) => {
+//     console.log('truoc khi request:::');
+//     console.log(config.url)
 
-    //Chung ta khong can kiem tra accessToken voi 2 routes nay
-    if (config.url.includes('user/login') || config.url.includes('user/refresh-token') || config.url.includes('user/get-cookie')) {
-        return config;
-    }
+//     //Chung ta khong can kiem tra accessToken voi 2 routes nay
+//     if (config.url.includes('user/login') || config.url.includes('user/refresh-token') || config.url.includes('user/get-cookie')) {
+//         return config;
+//     }
 
-    const {accessToken, timeExpired} = await instance.getCookieAccessToken();
-    console.log(`accessToken: ${accessToken} va timeExpired: ${timeExpired}`)
-    const now = new Date().getTime()
-    console.log(`timeExpired:::${timeExpired} vs now:::${now}`)
-    if (timeExpired < now) {
-        try {
-            console.log(`accessToken het han!!!`);
-            const { meta, data: {accessToken, timeExpired} } = await refreshToken();
-            console.log(meta.message);
-            console.log(accessToken);
-            if (meta.ok === true){
-                //set token vs timeExpired
-                await instance.setCookieAccessToken({accessToken, timeExpired});
-                console.log('dong 37:::', updateRef);
-                return config;
-            }
-        } catch (error) {
-            return Promise.reject(error)
-        }
-    }
+//     const {accessToken, timeExpired} = await instance.getCookieAccessToken();
+//     console.log(`accessToken: ${accessToken} va timeExpired: ${timeExpired}`)
+//     const now = new Date().getTime()
+//     console.log(`timeExpired:::${timeExpired} vs now:::${now}`)
+//     if (timeExpired < now) {
+//         try {
+//             console.log(`accessToken het han!!!`);
+//             // const { meta, data: {accessToken, timeExpired} } = await refreshToken();
+//             const { meta, data:  refreshToken_v} = await getNewRef();
+//             console.log(refreshToken_v.phuongpro_31);
+//             console.log(meta.message);
+//             // console.log(accessToken);
+//             if (meta.ok === true){
+//                 //set token vs timeExpired
+//                 await instance.setCookieAccessToken({accessToken, timeExpired});
+//                 // console.log('dong 37:::', updateRef);
+//                 return config;
+//             }
+//         } catch (error) {
+//             return Promise.reject(error)
+//         }
+//     }
 
-    return config;
-}, err => {
-    return Promise.reject(err)
-});
+//     return config;
+// }, err => {
+//     return Promise.reject(err)
+// });
 
 // Xu ly data SAU khi server response ve browser
 instance.interceptors.response.use( (response) => {
@@ -76,8 +78,18 @@ const btn_getAll = $('#getAll');
 if (btn_getAll) {
     btn_getAll.on('click', async (event) => {
         event.preventDefault();
-        const { meta, data: allUsers } = await getAll();
-        console.table(allUsers);
+        // const { meta, data: allUsers } = await getAll();
+        // const getRefCookie = await getNewRef();
+        const result1 = await instance.get("/user/set-cookie", {
+
+            //   mode: "same-origin",
+            //   redirect: "follow",
+            //   credentials: "include",
+            withCredentials: true,
+          });
+          console.log(result1);
+
+        // console.table(getRefCookie);
     });
 }
 
@@ -104,10 +116,12 @@ async function refreshToken() {
 }
 
 async function getNewRef() {
-    // return (await instance.get('user/get-cookie')).data;
-    return (await fetch('http://localhost:3000/api/user/getcookie', {
-        method: 'GET',
+    return (await instance.get('user/get-cookie',{
+        withCredentials: true,
     })).data;
+    // return (await fetch('http://localhost:3000/api/user/getcookie', {
+    //     method: 'GET',
+    // })).data;
 }
 
 instance.setCookieAccessToken = async ({accessToken, timeExpired}) => {

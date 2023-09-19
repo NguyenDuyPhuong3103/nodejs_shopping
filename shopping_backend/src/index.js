@@ -10,10 +10,17 @@ const envFilePath = path.join(__dirname, 'pre-start/env/development.env');
 const app = express();
 
 
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
 //Use cookie-parser middleware
 app.use(cookieParser());
 
-app.use(cors());
+const corsOptions = {
+    origin: true, //included origin as true
+    credentials: true, //included credentials as true
+};
+
+app.use(cors(corsOptions));
 
 require('dotenv').config({ path: envFilePath });
 
@@ -29,8 +36,6 @@ const baseRouter = require('./routes/index.route');
 const db = require('./config/db/index.db');
 const { Console } = require('console');
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
 
 // parse application/json
 app.use(bodyParser.json())
@@ -39,8 +44,6 @@ app.use(bodyParser.json())
 db.connect();
 
 app.use(morgan('combined'));
-
-
 
 //Static file
 app.use(express.static(path.join(__dirname, '../../shopping_frontend/assets')));

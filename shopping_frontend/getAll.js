@@ -100,7 +100,7 @@ async function login() {
 }
 
 async function refreshToken() {
-    return (await instance.post('user/refresh-token')).data;
+    return (await instance.get('user/refresh-token')).data;
 }
 
 async function getNewRef() {

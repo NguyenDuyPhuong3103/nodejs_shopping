@@ -77,10 +77,7 @@ class UserController {
 
             const accessToken = await signAccessToken(user._id);
             const refreshToken = await signRefreshToken(user._id);
-
-            // const accessToken = await signAccessToken({_id: user._id, admin:  user.admin});
-            // const refreshToken = await signRefreshToken({_id: user._id, admin:  user.admin});
-
+            
             const tokenInSchema = await RefreshTokenModel.findOne({user: user._id});
             if(!tokenInSchema) {
                 const refreshTokenModel = new RefreshTokenModel({
@@ -96,20 +93,14 @@ class UserController {
                 );
             }
 
-            await res.cookie("refreshToken", refreshToken, {
-                httpOnly:true,
-                secure:false,
-                path:"/",
-                sameSite: "None",
-            })
-            console.log('dong 105, refreshToken:::', refreshToken);
+            await res.cookie("refreshToken", refreshToken, { maxAge: 1000 * 60 * 10, httpOnly: false })
+
 
             return res.status(StatusCodes.ACCEPTED).json(responseFormat(true, {
                 message: 'Ban da dang nhap thanh cong!!!'
             }, {
                 accessToken,
                 timeExpired: Date.now() + (30 * 1000)
-                // refreshToken,
             })).end();
         } catch (error) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
@@ -149,12 +140,7 @@ class UserController {
                     {new: true}
                 );
 
-                res.cookie("refreshToken", newRef, {
-                    httpOnly:true,
-                    secure:false,
-                    path:"/",
-                    sameSite: "none",
-                })
+                res.cookie("refreshToken", newRef, { maxAge: 1000 * 60 * 10, httpOnly: false })
 
                 return res.status(StatusCodes.OK).json(responseFormat(true, { 
                     message: `Refresh Token thanh cong!!!`},{
@@ -216,22 +202,21 @@ class UserController {
 
     //[GET] /set-cookie 
     async setCookie(req, res, next) {
-        res.cookie("phuongpro", 'phuongphungphinh');
-        res.send('cookie is set phuongpro = phuongphungphinh')
+        await res.cookie("111", '111',{ maxAge: 1000 * 60 * 10, httpOnly: false });
+        res.send('cookie is set 111 = 111')
     }
 
     //[GET] /get-cookie 
     async getCookie(req, res, next) {
         const refreshToken_v = await req.cookies.refreshToken;
-        console.log('dong 226:::',refreshToken_v);
-        console.log('dong 227:::',req.cookies);
+        console.log(refreshToken_v)
         return res.status(StatusCodes.ACCEPTED).json(responseFormat(true, {
             message: 'lay duoc refresh token !!!'
         }, {
             refreshToken_v,
         })).end();
     }
-
+    
     //[GET] /
     async getAllUsers(req, res, next) {
         try {

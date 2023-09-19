@@ -42,9 +42,11 @@ const verifyAccessToken = async (req, res, next) => {
             message: `Khong co authorization o phan header duoc gui len tu client!!!` 
         })).end());
     }
+    console.log('da verify access token')
     const authHeader = req.headers['authorization'];
     const bearerToken = authHeader.split(' ');
     const token = bearerToken[1];
+    console.log('dong 49 da verify access token:::', token)
     //verify access token
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if (err) {
@@ -53,21 +55,10 @@ const verifyAccessToken = async (req, res, next) => {
                 err: err,
             })).end();
         }
+        //middlerware tiếp theo có thể dùng req.user để authorization
         req.payload = payload;
         next();
     }) 
-}
-
-const verifyAccessTokenWithAdmin = async (req, res, next) => {
-    verifyAccessToken(req, res, next, ()=>{
-        if (userId == req.params.id || req.user.admin){
-            next();
-        }else{
-            return res.status(StatusCodes.FORBIDDEN).json(responseFormat(false, { 
-                message: `Ban khong duoc phep xoa nguoi dung nay!!!` 
-            })).end();
-        }
-    });
 }
 
 const verifyRefreshToken = async (refreshToken) => {
@@ -90,5 +81,4 @@ module.exports = {
     verifyAccessToken, 
     signRefreshToken,
     verifyRefreshToken,
-    verifyAccessTokenWithAdmin
 }

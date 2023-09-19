@@ -32,6 +32,7 @@ instance.interceptors.request.use( async (config) => {
             console.log(accessToken);
             if (meta.ok === true){
                 //set token vs timeExpired
+                config.headers['authorization'] = `Bearer ${accessToken}`;
                 await instance.setCookieAccessToken({accessToken, timeExpired});
                 return config;
             }
@@ -82,43 +83,12 @@ if (btn_getAll) {
     });
 }
 
-// async function getAll() {
-//     const {accessToken} = await instance.getCookieAccessToken();
-//     console.log('dong 87:::', accessToken);
-//     return (await instance.get('user',
-//     {headers: {authorization: `Bearer ${accessToken}`}},
-//     )).data;
-// }
-
 async function getAll() {
-    let { accessToken } = await instance.getCookieAccessToken();
+    const {accessToken} = await instance.getCookieAccessToken();
     console.log('dong 87:::', accessToken);
-    
-    const now = new Date().getTime();
-    const { timeExpired } = await instance.getCookieAccessToken();
-    
-    // Kiểm tra xem accessToken đã hết hạn chưa
-    if (timeExpired < now) {
-        try {
-            console.log('accessToken đã hết hạn, đang cố gắng lấy lại...');
-            const { meta, resData: { accessToken, timeExpired } } = await refreshToken();
-            console.log(meta.message);
-            console.log(accessToken);
-            
-            if (meta.ok === true) {
-                // Cập nhật accessToken trong cookie
-                await instance.setCookieAccessToken({ accessToken, timeExpired });
-                
-                // Sử dụng accessToken mới cho yêu cầu
-                return (await instance.get('user', { headers: { authorization: `Bearer ${accessToken}` } })).data;
-            }
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    // Sử dụng accessToken hiện tại cho yêu cầu
-    return (await instance.get('user', { headers: { authorization: `Bearer ${accessToken}` } })).data;
+    return (await instance.get('user',
+    {headers: {authorization: `Bearer ${accessToken}`}},
+    )).data;
 }
 
 async function login() {

@@ -99,8 +99,7 @@ class UserController {
             return res.status(StatusCodes.ACCEPTED).json(responseFormat(true, {
                 message: 'Ban da dang nhap thanh cong!!!'
             }, {
-                accessToken,
-                timeExpired: Date.now() + (30 * 1000)
+                accessToken
             })).end();
         } catch (error) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
@@ -144,8 +143,7 @@ class UserController {
 
                 return res.status(StatusCodes.OK).json(responseFormat(true, { 
                     message: `Refresh Token thanh cong!!!`},{
-                        accessToken,
-                        timeExpired: Date.now() + (60 * 1000)
+                        accessToken
                     })).end();
             }
         } catch (error) {
@@ -198,23 +196,6 @@ class UserController {
                 error: error, 
             }));
         }
-    }
-
-    //[GET] /set-cookie 
-    async setCookie(req, res, next) {
-        await res.cookie("111", '111',{ maxAge: 1000 * 60 * 10, httpOnly: false });
-        res.send('cookie is set 111 = 111')
-    }
-
-    //[GET] /get-cookie 
-    async getCookie(req, res, next) {
-        const refreshToken_v = await req.cookies.refreshToken;
-        console.log(refreshToken_v)
-        return res.status(StatusCodes.ACCEPTED).json(responseFormat(true, {
-            message: 'lay duoc refresh token !!!'
-        }, {
-            refreshToken_v,
-        })).end();
     }
     
     //[GET] /

@@ -13,8 +13,6 @@ router.post('/login', validate(schemas.userSchema), userController.login);
 router.get('/refresh-token', userController.refreshToken);
 router.post('/logout',verifyAccessToken, userController.logout);
 router.delete('/:id', userController.deleteUser);
-router.get('/set-cookie', userController.setCookie);
-router.get('/get-cookie', userController.getCookie);
 router.get('/',verifyAccessToken, userController.getAllUsers);
 
 module.exports = router;

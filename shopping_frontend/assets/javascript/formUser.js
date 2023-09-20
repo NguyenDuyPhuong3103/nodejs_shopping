@@ -57,10 +57,10 @@ instance.interceptors.response.use( (response) => {
 
 //function
 
-const btn_login = $('#formUser');
+const btnLogin = $('#formUser');
 
-if(btn_login){
-    btn_login.on('submit', async (event) => {
+if(btnLogin){
+    btnLogin.on('submit', async (event) => {
         event.preventDefault();
         // Xử lý dữ liệu phản hồi ở đây
         const { meta, resData: {accessToken, timeExpired} } = await login();
@@ -73,10 +73,10 @@ if(btn_login){
     });
 }
 
-const btn_getAll = $('#getAll');
+const btnGetAll = $('#getAll');
 
-if (btn_getAll) {
-    btn_getAll.on('click', async (event) => {
+if (btnGetAll) {
+    btnGetAll.on('click', async (event) => {
         event.preventDefault();
         const { meta, resData: allUsers } = await getAll();
         console.log(allUsers);
@@ -98,9 +98,6 @@ async function login() {
         {
             email: email,
             password: password
-        },
-        {
-            withCredentials: true
         }
     )).data;
 }

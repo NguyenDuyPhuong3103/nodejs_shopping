@@ -9,7 +9,7 @@ const signAccessToken = async (userId) => {            /* user */
         }
         const secret = process.env.ACCESS_TOKEN_SECRET;
         const options = {
-            expiresIn: '30s' //10m 10s
+            expiresIn: '3s' //10m 10s
         }
 
         jwt.sign(payload, secret, options, (err, token) => {
@@ -50,7 +50,7 @@ const verifyAccessToken = async (req, res, next) => {
     //verify access token
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if (err) {
-            return res.status(StatusCodes.UNAUTHORIZED).json(responseFormat(false, { 
+            return res.status(StatusCodes.OK).json(responseFormat(false, { 
                 message: `co loi o phan verifyAccessToken, token khong hop le!!!`,
                 err: err,
             })).end();

@@ -1,20 +1,22 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
-const { boolean } = require('joi');
 
 // Create Users model
 const users = new Schema({
-    username: {
-        type: String,
-    },
-    password: {
-        type: String,
-    },
-    // admin: {
-    //     type: Boolean,
-    //     default: false
-    // }
+    email: {type: String, required: true},
+    password: {type: String, required: true},
+    name: {type: String, required: true},
+    sex: String,
+    phone: String,
+    birth: Date,
+    address: String,
+    shops:[{
+        shop: {type: Schema.Types.ObjectId, ref: 'Shop'}
+    }],
+    products:[{
+        product: {type: Schema.Types.ObjectId, ref: 'Product'}
+    }],
 }, {
     timestamps: true,
 });

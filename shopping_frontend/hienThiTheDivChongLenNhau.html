@@ -1,0 +1,72 @@
+<!-- cho nhiều thẻ div chồng lên nhau và có nhiều buttons tương ứng với từng thẻ div. 
+    Cho ví dụ về 1 đoạn code ta có thể click vào button nào thì thẻ div tương ứng đó hiện lên và các thẻ div khác ẩn đi bằng bootrap 4 -->
+
+<!-- lời giải -->
+
+<!-- Để có nhiều thẻ <div> chồng lên nhau và có nhiều nút tương ứng để hiển thị từng <div> và ẩn các <div> khác khi bạn click 
+vào các nút, bạn có thể sử dụng Bootstrap 4 và JavaScript. Dưới đây là ví dụ về cách làm điều này: -->
+
+<!-- HTML: -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <title>Toggle Divs with Buttons</title>
+</head>
+<body>
+  <div class="container">
+    <!-- Buttons -->
+    <div class="btn-group">
+      <button class="btn btn-primary" data-target="div1">Show Div 1</button>
+      <button class="btn btn-primary" data-target="div2">Show Div 2</button>
+      <button class="btn btn-primary" data-target="div3">Show Div 3</button>
+    </div>
+
+    <!-- Divs -->
+    <div id="div1" class="mt-4">This is Div 1</div>
+    <div id="div2" class="mt-4">This is Div 2</div>
+    <div id="div3" class="mt-4">This is Div 3</div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      // Ẩn tất cả các div ban đầu
+      $('div[id^="div"]').hide();
+
+      // Xử lý sự kiện khi click vào button
+      $('.btn').click(function () {
+        // Lấy giá trị data-target từ button được click
+        var targetDiv = $(this).data('target');
+        
+        // Ẩn tất cả các div
+        $('div[id^="div"]').hide();
+
+        // Hiển thị div tương ứng
+        $('#' + targetDiv).show();
+      });
+    });
+  </script>
+
+</body>
+</html>
+
+<!-- Trong ví dụ này: -->
+
+<!-- 1/ Chúng ta có ba nút "Show Div 1," "Show Div 2," và "Show Div 3" để hiển thị các <div> tương ứng. -->
+
+<!-- 2/ Mỗi nút có thuộc tính data-toggle="collapse" và data-target="#divX", trong đó "X" là số thứ tự của <div> mà nút đó sẽ hiển thị. 
+Ví dụ, data-target="#div1" sẽ hiển thị <div> có ID là "div1" khi nút "Show Div 1" được click. -->
+
+<!-- 3/ Các <div> có ID tương ứng ("div1," "div2," và "div3") và lớp "collapse" để ẩn chúng mặc định. -->
+
+<!-- 4/ Sử dụng Bootstrap 4 để định dạng nút và <div> để chúng có giao diện đẹp. -->
+
+<!-- Khi bạn click vào các nút, các <div> sẽ hiển thị hoặc ẩn đi tùy thuộc vào nút bạn click, 
+giúp bạn hiển thị một <div> và ẩn các <div> còn lại. -->

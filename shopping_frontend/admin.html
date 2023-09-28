@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>shopping</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="./assets/css/main.css">
+    <link type="text/css" rel="stylesheet" href="./assets/css/base.css">
+    <link rel="stylesheet" href="./postedProducts/postedProducts.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/vendor/open-iconic-master/font/css/open-iconic-bootstrap.css">
+</head>
+<body>
+    <div class="app">
+      <!-- HEADER -->
+      <header class="header">
+          <nav class="navbar row navbar-expand navbar-dark bg-dark bd-navbar">
+            <div class="container">
+              <a class="navbar-brand col-md-1" href="#">LOGO</a>
+
+              <form class="form-inline my-2 my-lg-0 collapse navbar-collapse flex-grow-1 justify-content-md-center">
+                <input class="form-control mr-sm-2 col-md-8" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+              </form>
+
+              <div class="col-md-3" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">
+                      <span class="oi oi-bell"></span>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">
+                      <span class="oi oi-envelope-closed"></span>
+                    </a>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <img src="./assets/img/chan-dung.jpg" alt="Ảnh avatar" class="user-avatar">
+                      Duy Phương
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="">
+                          <span class="oi oi-person"></span>
+                          Your profile
+                        </a>
+                        <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="">
+                              <span class="oi oi-question-mark"></span>
+                              Help
+                            </a>
+                            <a class="dropdown-item" href="">
+                              <span class="oi oi-cog"></span>
+                              Setting
+                            </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">
+                          <span class="oi oi-account-logout"></span>
+                          Sign out
+                        </a>
+                    </div>
+                </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+      </header>
+
+      <!-- body -->
+      <div class="container">
+        <div class="row mt-5">
+          <div class="col-md-2 list-group">
+            <a href="#" class="list-group-item list-group-item-action active">
+              Shops
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">Categories</a>
+            <a href="#" class="list-group-item list-group-item-action">Products</a>
+            <a href="#" class="list-group-item list-group-item-action">Orders</a>
+            <a href="#" class="list-group-item list-group-item-action disabled">Anything</a>
+          </div>
+          <div class="col-md-10">
+            <div class="row">
+              <a href="./formProduct/formProduct.html" type="button" class="mr-4 btn btn-secondary">Create item</a>
+              <button type="button" class="mr-4 btn btn-secondary">actions</button>
+              <button type="button" class="btn btn-secondary">actions</button>
+            </div>
+            <div class="row mt-4">
+              <table class="table table-striped table-bordered">
+                <thead class="text-center">
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Products Name</th>
+                    <th scope="col">Classification</th>
+                    <th scope="col">Price (VND)</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody id="postedProducts">
+                    
+                </tbody>
+              </table>
+            </div>
+            <div class="row justify-content-end">
+              <nav aria-label="Page navigation example">
+                <ul class="pagination">
+              
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- confirm delete product -->
+    <div id="deleteProductModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Delete the product</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this product?</p>
+          </div>
+          <div class="modal-footer">
+            <button id="btn-delete-product" type="button" class="btn btn-primary">Delete</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="./assets/javascript/pagination.js"></script>
+</body>
+</html>

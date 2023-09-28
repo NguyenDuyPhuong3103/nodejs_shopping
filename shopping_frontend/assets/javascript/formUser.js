@@ -9,46 +9,38 @@ const instance = axios.create({
     }
 });
 
-
 // Xu ly data TRUOC khi gui request den server
 instance.interceptors.request.use( async (config) => {
-    console.log('truoc khi request:::');
-    console.log(config.url)
-
     //Chung ta khong can kiem tra accessToken voi 2 routes nay
-    if (config.url.includes('user/login') || config.url.includes('user/refresh-token') || config.url.includes('user/set-cookie')  || config.url.includes('user/get-cookie')) {
+    if (config.url.includes('user/login') || config.url.includes('user/refresh-token')) {
         return config;
     }
-
-    const {accessToken, timeExpired} = await instance.getCookieAccessToken();
-    console.log(`accessToken: ${accessToken} va timeExpired: ${timeExpired}`)
-    const now = new Date().getTime()
-    console.log(`timeExpired:::${timeExpired} vs now:::${now}`)
-    if (timeExpired < now) {
-        try {
-            console.log(`accessToken het han!!!`);
-            const { meta, resData: {accessToken, timeExpired} } = await refreshToken();
-            console.log(meta.message);
-            console.log(accessToken);
-            if (meta.ok === true){
-                //set token vs timeExpired
-                config.headers['authorization'] = `Bearer ${accessToken}`;
-                await instance.setCookieAccessToken({accessToken, timeExpired});
-                return config;
-            }
-        } catch (error) {
-            return Promise.reject(error)
-        }
-    }
-
+    const accessToken = await instance.getCookieAccessToken();
+    config.headers['authorization'] = `Bearer ${accessToken}`
     return config;
 }, err => {
     return Promise.reject(err)
 });
 
 // Xu ly data SAU khi server response ve browser
-instance.interceptors.response.use( (response) => {
-    console.log('sau khi response:::');
+instance.interceptors.response.use( async(response) => {
+    const config = response.config;
+    if (config.url.includes('user/login') || config.url.includes('user/refresh-token')) {
+        return response;
+    }
+    const {ok} = response.data.meta;
+    if (ok === false) {
+        //step 1: get token from refreshToken
+        const { meta, resData : {accessToken} } = await refreshToken();
+        if (accessToken){
+            //step 2: 
+            config.headers['authorization'] = `Bearer ${accessToken}`;
+            //step 3: 
+            await instance.setCookieAccessToken(accessToken);
+
+            return instance(config);
+        }
+    }
 
     return response;
 }, err => {
@@ -63,12 +55,10 @@ if(btnLogin){
     btnLogin.on('submit', async (event) => {
         event.preventDefault();
         // Xử lý dữ liệu phản hồi ở đây
-        const { meta, resData: {accessToken, timeExpired} } = await login();
-        console.log(meta.message);
-        console.log(accessToken);
+        const { meta, resData: {accessToken} } = await login();
         if (meta.ok === true){
             //set token vs timeExpired
-            await instance.setCookieAccessToken({accessToken, timeExpired});
+            await instance.setCookieAccessToken(accessToken);
         }
     });
 }
@@ -84,11 +74,7 @@ if (btnGetAll) {
 }
 
 async function getAll() {
-    const {accessToken} = await instance.getCookieAccessToken();
-    console.log('dong 87:::', accessToken);
-    return (await instance.get('user',
-    {headers: {authorization: `Bearer ${accessToken}`}},
-    )).data;
+    return (await instance.get('user')).data;
 }
 
 async function login() {
@@ -106,37 +92,10 @@ async function refreshToken() {
     return (await instance.get('user/refresh-token')).data;
 }
 
-const setBtn = $('#setCookieServer');
-
-if (setBtn) {
-    setBtn.on('click', async (event) => {
-        event.preventDefault();
-        const result = await instance.get("user/set-cookie", {
-            withCredentials: true,
-          });
-          console.log(result);
-    });
-}
-async function setCookieServer() {
-    return (await instance.get('user/set-cookie')).data;
-}
-
-const getBtn = $('#getCookieServer');
-
-if (getBtn) {
-    getBtn.on('click', async (event) => {
-        event.preventDefault();
-        const result1 = await instance.get("user/get-cookie", {
-            withCredentials: true,
-          });
-        console.log(result1.data.resData);
-    });
-}
-
-instance.setCookieAccessToken = async ({accessToken, timeExpired}) => {
-    setCookie('accessToken', JSON.stringify({accessToken, timeExpired}), 1);
+instance.setCookieAccessToken = async (token) => {
+    setCookie('accessToken', token, 1);
 }
 
 instance.getCookieAccessToken = async () => {
-    return JSON.parse(getCookie("accessToken"));
+    return getCookie("accessToken");
 }

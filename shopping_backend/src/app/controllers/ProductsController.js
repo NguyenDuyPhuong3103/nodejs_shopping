@@ -1,11 +1,10 @@
-//import collection (Products) in mongoDB compass => Products export model (Schema)
 const Product = require('../models/Products.model');
 const pageSize = 2;
 
 class ProductsController {
 
     //[GET] /products
-    getAllsProducts(req, res, next){
+    getAllProducts(req, res, next){
         var page = req.query.page;
 
         if (page) {
@@ -37,12 +36,6 @@ class ProductsController {
                 .then(products => res.json(products))
                 .catch(next);
         }
-    }
-    //[GET] /products/AllPostedProducts
-    getAllProducts(req, res, next){
-        Product.find({})
-            .then(products => res.json(products))
-            .catch(next);
     }
 
     //[GET] /products/:id

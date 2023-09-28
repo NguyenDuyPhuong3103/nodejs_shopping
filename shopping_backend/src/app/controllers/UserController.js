@@ -1,14 +1,8 @@
-//import collection (Products) in mongoDB compass => Products export model (Schema)
 const Product = require('../models/Products.model');
-//import collection (Users) in mongoDB compass => Users export model (Schema)
 const User = require('../models/Users.model');
-//import collection (RefreshTokens) in mongoDB compass => RefreshTokens export model (Schema)
 const RefreshTokenModel = require('../models/RefreshTokens.model');
-
 const responseFormat = require('../../util/responseFormat.js');
-
 const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../middleware/jwtService');
-
 const {StatusCodes} = require('http-status-codes');
 
 class UserController {
@@ -19,36 +13,33 @@ class UserController {
             const { email, password } = req.body;
 
             const isExits = await User.findOne({
-                username: email
+                email
             });
 
             if (isExits) {
-                return res.status(StatusCodes.CONFLICT).json(responseFormat(false, { 
+                return res.status(StatusCodes.OK).json(responseFormat(false, { 
                     message: `${email} da ton tai, vui long nhap email khac!!!` 
-                })).end();
+                }));
             };
 
-            const user = new User({
-                username: email,
-                password,
-            });
+            const user = new User(req.body);
 
             const saveUser = await user.save()
 
             if (!saveUser) {
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+                return res.status(StatusCodes.OK).json(responseFormat(false, { 
                     message: 'Lỗi khi tạo người dùng!!!' 
-                })).end();
+                }));
             }
 
             return res.status(StatusCodes.CREATED).json(responseFormat(true, {
                 message: 'Ban da dang ky thanh cong!!!'
-            }, saveUser)).end();
+            }, saveUser));
         } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            return res.status(StatusCodes.OK).json(responseFormat(false, { 
                 message: `Co loi o server register`,
                 error: error, 
-            })).end();
+            }));
         }
     }
 
@@ -58,7 +49,7 @@ class UserController {
             const { email, password } = req.body;
             
             const user = await User.findOne({
-                username: email
+                email
             });
 
             if (!user) {

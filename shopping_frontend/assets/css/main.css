@@ -1,3 +1,7 @@
+body {
+    position: relative;
+  }
+
 .navbar{
     height: 64px;
 }

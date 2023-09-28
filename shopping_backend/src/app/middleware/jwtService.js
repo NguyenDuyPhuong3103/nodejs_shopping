@@ -2,14 +2,14 @@ const jwt = require('jsonwebtoken');
 const {StatusCodes} = require('http-status-codes');
 const responseFormat = require('../../util/responseFormat.js');
 
-const signAccessToken = async (userId) => {            /* user */ 
+const signAccessToken = async (userId) => { 
     return new Promise ((resolve, reject) => {
         const payload ={
             userId,
         }
         const secret = process.env.ACCESS_TOKEN_SECRET;
         const options = {
-            expiresIn: '3s' //10m 10s
+            expiresIn: '10s' //10m 10s
         }
 
         jwt.sign(payload, secret, options, (err, token) => {
@@ -46,7 +46,6 @@ const verifyAccessToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const bearerToken = authHeader.split(' ');
     const token = bearerToken[1];
-    console.log('dong 49 da verify access token:::', token)
     //verify access token
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if (err) {

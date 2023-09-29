@@ -16,6 +16,8 @@ const schemas = {
             .min(2)
             .max(40)
             .lowercase(),
+        avatar: joi.string()
+            .lowercase(),
         sex: joi.string()
             .min(2)
             .max(3),

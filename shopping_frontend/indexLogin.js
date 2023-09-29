@@ -7,51 +7,55 @@ const instance = axios.create({
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
     }
-});
+})
 
 // Xu ly data TRUOC khi gui request den server
 instance.interceptors.request.use( async (config) => {
+    // if (window.location.href = '../getAllProducts/getAllProducts.html') {
+        
+    // }
     //Chung ta khong can kiem tra accessToken voi 2 routes nay
     if (config.url.includes('user/login') || config.url.includes('user/register') || config.url.includes('user/refresh-token') || config.url.includes('products')) {
-        return config;
+        return config
     }
-    const accessToken = await instance.getCookieAccessToken();
+    const accessToken = await instance.getCookieAccessToken()
     config.headers['authorization'] = `Bearer ${accessToken}`
-    return config;
+    return config
 }, err => {
     return Promise.reject(err)
-});
+})
 
 // Xu ly data SAU khi server response ve browser
 instance.interceptors.response.use( async(response) => {
-    const config = response.config;
+    const config = response.config
     if (config.url.includes('user/login')  || config.url.includes('user/register') || config.url.includes('user/refresh-token') || config.url.includes('products')) {
-        return response;
+        return response
     }
-    const {ok} = response.data.meta;
+    const {ok} = response.data.meta
     if (ok === false) {
         //step 1: get token from refreshToken
-        const { meta, resData : {accessToken} } = await refreshToken();
+        const { meta, resData : {accessToken} } = await refreshToken()
         if (accessToken){
             //step 2: 
-            config.headers['authorization'] = `Bearer ${accessToken}`;
+            config.headers['authorization'] = `Bearer ${accessToken}`
             //step 3: 
-            await instance.setCookieAccessToken(accessToken);
+            await instance.setCookieAccessToken(accessToken)
 
-            return instance(config);
+            return instance(config)
         }
     }
 
-    return response;
+    return response
 }, err => {
     return Promise.reject(err)
-});
+})
 
 //before login/ sign up
+var infoUser
 
 instance.get('products')
-    .then(response => {
-        const products = response.data;
+    .then(async response => {
+        const products = response.data
         const htmls = products.map(function(product){
             return `
                 <div class="col-sm-6 col-lg-4">
@@ -68,107 +72,175 @@ instance.get('products')
                     </div>
                 </div> 
             `
-        });
+        })
         
-        const  html = htmls.join('');
-        document.getElementById('getAllProducts').innerHTML = html;
+        const  html = await htmls.join('')
+        await $('#getAllProducts').html(html)
+
+        navHtml = `
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                Ngôn ngữ
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Việt Nam</a>
+                    <a class="dropdown-item" href="#">English</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="" class="nav-link" data-toggle="modal" data-target="#loginModal">Đăng nhập</a>
+            </li>
+            <li class="nav-item">
+                <a href="" class="nav-link" data-toggle="modal" data-target="#signupModal">Đăng ký</a>
+            </li>
+        `
+        await $('#info').append(navHtml)
+        
     })
     .catch(function(error){
-        alert('có lỗi ở phần front end!!! ');
-        console.log(error);
-    });
+        alert('có lỗi ở phần front end!!! ')
+        console.log(error)
+    })
 
 //function
 
-const btnLogin = $('#loginForm');
+const btnLogin = $('#loginForm')
 
 if(btnLogin){
     btnLogin.on('submit', async (event) => {
-        event.preventDefault();
+        event.preventDefault()
+        await $("#loginModal").modal("hide");
         // Xử lý dữ liệu phản hồi ở đây
-        const { meta, resData: {accessToken} } = await login();
+        const { meta, resData: {accessToken} } = await login()
         if (meta.ok === true){
             //set token vs timeExpired
-            await instance.setCookieAccessToken(accessToken);
-            alert(meta.message);
-            
+            await instance.setCookieAccessToken(accessToken)
+            alert(meta.message)
+            const { meta: metaInfo, resData: { infoUser } } = await getInfo();
+            console.log(infoUser)
+            if (metaInfo.ok === true){
+                navInfoHtml = `
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                        Ngôn ngữ
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">Việt Nam</a>
+                            <a class="dropdown-item" href="#">English</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="${infoUser.avatar}" alt="Ảnh avatar" class="user-avatar">
+                            ${infoUser.name}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="">
+                                <span class="oi oi-person"></span>
+                                Your profile
+                            </a>
+                            <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="">
+                                    <span class="oi oi-question-mark"></span>
+                                    Help
+                                </a>
+                                <a class="dropdown-item" href="">
+                                    <span class="oi oi-cog"></span>
+                                    Setting
+                                </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">
+                                <span class="oi oi-account-logout"></span>
+                                Sign out
+                            </a>
+                        </div>
+                    </li>
+                `
+            await $('#info').html(navInfoHtml)
+            }
         }
-    });
+    })
 }
 
 async function login() {
-    const email = $('#emailLogin').val();
-    const password = $('#passwordLogin').val();
+    const email = $('#emailLogin').val()
+    const password = $('#passwordLogin').val()
     return (await instance.post('user/login',
         {
             email,
             password
         }
-    )).data;
+    )).data
 }
 
-const btnSignup = $('#signupForm');
+const btnSignup = $('#signupForm')
 
 if(btnSignup){
     btnSignup.on('submit', async (event) => {
-        event.preventDefault();
+        event.preventDefault()
         // Xử lý dữ liệu phản hồi ở đây
-        const { meta, resData } = await signup();
+        const { meta, resData } = await signup()
         if (meta.ok === true ) {
-            alert(meta.message);
             // Nếu đăng nhập thành công thì đưa đến trang  My profile
-            // const currentPageURL = './index copy.html';
-            // window.location.href = currentPageURL;
+            const currentPageURL = './indexLogged.html'
+            window.location.href = currentPageURL
+            alert(meta.message)
         } else {
-            alert(meta.message);
-            $('#signupForm').innerHTML;
+            alert(meta.message)
+            $('#signupForm').innerHTML
         }
-    });
+    })
 }
 
 async function signup() {
-    const email = $('#emailSignup').val();
-    const password = $('#passwordSignup').val();
-    const name = $('#nameSignup').val();
-    const sex = $('#sexSignup').val();
-    const phone = $('#phoneSignup').val();
-    const address = $('#addressSignup').val();
-    const birth = $('#birthSignup').val();
+    const email = $('#emailSignup').val()
+    const password = $('#passwordSignup').val()
+    const name = $('#nameSignup').val()
+    const avatar = $('#avatarSignup').val()
+    const sex = $('#sexSignup').val()
+    const phone = $('#phoneSignup').val()
+    const address = $('#addressSignup').val()
+    const birth = $('#birthSignup').val()
     return (await instance.post('user/register',
         {
             email,
             password,
             name,
+            avatar,
             sex,
             phone,
             address,
             birth,
         }
-    )).data;
+    )).data
 }
 
-const btnGetAll = $('#getAll');
+const btnGetAll = $('#getAll')
 
 if (btnGetAll) {
     btnGetAll.on('click', async (event) => {
-        event.preventDefault();
-        const { meta, resData: allUsers } = await getAll();
-        console.log(allUsers);
-    });
+        event.preventDefault()
+        const { meta, resData: allUsers } = await getAll()
+        console.log(allUsers)
+    })
 }
 
-async function getAll() {
-    return (await instance.get('user')).data;
+// async function getAll() {
+//     return (await instance.get('user')).data
+// }
+
+async function getInfo() {
+    return (await instance.get('user')).data
 }
 
 async function refreshToken() {
-    return (await instance.get('user/refresh-token')).data;
+    return (await instance.get('user/refresh-token')).data
 }
 
 instance.setCookieAccessToken = async (token) => {
-    setCookie('accessToken', token, 1);
+    setCookie('accessToken', token, 1)
 }
 
 instance.getCookieAccessToken = async () => {
-    return getCookie("accessToken");
+    return getCookie("accessToken")
 }

@@ -11,6 +11,7 @@ const users = new Schema({
     phone: String,
     birth: Date,
     address: String,
+    avatar: String,
     shops:[{
         shop: {type: Schema.Types.ObjectId, ref: 'Shop'}
     }],

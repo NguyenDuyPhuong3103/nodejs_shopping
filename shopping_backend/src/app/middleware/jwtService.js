@@ -9,7 +9,7 @@ const signAccessToken = async (userId) => {
         }
         const secret = process.env.ACCESS_TOKEN_SECRET;
         const options = {
-            expiresIn: '10s' //10m 10s
+            expiresIn: '1h' //10m 10s
         }
 
         jwt.sign(payload, secret, options, (err, token) => {

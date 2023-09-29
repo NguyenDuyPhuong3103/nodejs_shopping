@@ -188,6 +188,23 @@ class UserController {
             }));
         }
     }
+
+    //[GET] /
+    // lấy thông tin user logged
+    async getInfoUsers(req, res, next) {
+        try {
+            const user_id = await req.payload.userId;
+            const infoUser = await User.findOne({ _id: user_id})
+            return res.status(StatusCodes.OK).json(responseFormat(true, 
+                {message: `200 OK`},
+                {infoUser}));
+        } catch (error) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+                message: `Co loi o server getInfoUsers`,
+                error: error, 
+            }));
+        }
+    }
     
     //[GET] /
     async getAllUsers(req, res, next) {

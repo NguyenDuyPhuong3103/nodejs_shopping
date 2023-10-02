@@ -11,9 +11,6 @@ const instance = axios.create({
 
 // Xu ly data TRUOC khi gui request den server
 instance.interceptors.request.use( async (config) => {
-    // if (window.location.href = '../getAllProducts/getAllProducts.html') {
-        
-    // }
     //Chung ta khong can kiem tra accessToken voi 2 routes nay
     if (config.url.includes('user/login') || config.url.includes('user/register') || config.url.includes('user/refresh-token') || config.url.includes('products')) {
         return config
@@ -50,59 +47,96 @@ instance.interceptors.response.use( async(response) => {
     return Promise.reject(err)
 })
 
-//before login/ sign up
-var infoUser
-
-instance.get('products')
-    .then(async response => {
-        const products = response.data
-        const htmls = products.map(function(product){
-            return `
-                <div class="col-sm-6 col-lg-4">
-                    <div class="card card-course-item">
-                        <a href="./detailProduct/detailsProducts.html?id=${product._id}">
-                            <img class="card-img-top" src="${product.image}" alt="${product.name}">
-                        </a>
-                        <div class="card-body">
-                            <a href="./detailProduct/detailsProducts.html?id=${product._id}">
-                                <h5 class="card-title">${product.name}</h5>
-                            </a>
-                            <a href="./detailProduct/detailsProducts.html?id=${product._id}" class="btn btn-primary">Details</a>
-                        </div>
-                    </div>
-                </div> 
-            `
-        })
-        
-        const  html = await htmls.join('')
-        await $('#getAllProducts').html(html)
-
-        navHtml = `
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                Ngôn ngữ
-                </a>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#">Việt Nam</a>
-                    <a class="dropdown-item" href="#">English</a>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a href="" class="nav-link" data-toggle="modal" data-target="#loginModal">Đăng nhập</a>
-            </li>
-            <li class="nav-item">
-                <a href="" class="nav-link" data-toggle="modal" data-target="#signupModal">Đăng ký</a>
-            </li>
-        `
-        await $('#info').append(navHtml)
-        
-    })
-    .catch(function(error){
-        alert('có lỗi ở phần front end!!! ')
-        console.log(error)
-    })
-
 //function
+
+//truoc khi login/ sign up
+
+// nếu đã login và trở về lại trang chủ thì kiểm tra xem AT có còn không? Nếu còn thì gọi hàm callInfo()
+// const oldAccessToken = getCookie("accessToken")
+// if (oldAccessToken) {
+//     callInfo()
+//     instance.get('products')
+//         .then(async response => {
+//             const products = response.data
+//             const htmls = products.map(function(product){
+//                 return `
+//                     <div class="col-sm-6 col-lg-4">
+//                         <div class="card card-course-item">
+//                             <a href="./detailProduct/detailsProducts.html?id=${product._id}">
+//                                 <img class="card-img-top" src="${product.image}" alt="${product.name}">
+//                             </a>
+//                             <div class="card-body">
+//                                 <a href="./detailProduct/detailsProducts.html?id=${product._id}">
+//                                     <h5 class="card-title">${product.name}</h5>
+//                                 </a>
+//                                 <a href="./detailProduct/detailsProducts.html?id=${product._id}" class="btn btn-primary">Details</a>
+//                             </div>
+//                         </div>
+//                     </div> 
+//                 `
+//             })
+            
+//             const  html = await htmls.join('')
+//             await $('#getAllProducts').html(html)
+//         })
+//         .catch(function(error){
+//             alert('có lỗi ở phần front end!!! ')
+//             console.log(error)
+//         })
+// } else {
+//     getNav()
+// }
+getNav()
+async function getNav() {
+    instance.get('products')
+        .then(async response => {
+            const products = response.data
+            const htmls = products.map(function(product){
+                return `
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card card-course-item">
+                            <a href="./detailProduct/detailsProducts.html?id=${product._id}">
+                                <img class="card-img-top" src="${product.image}" alt="${product.name}">
+                            </a>
+                            <div class="card-body">
+                                <a href="./detailProduct/detailsProducts.html?id=${product._id}">
+                                    <h5 class="card-title">${product.name}</h5>
+                                </a>
+                                <a href="./detailProduct/detailsProducts.html?id=${product._id}" class="btn btn-primary">Details</a>
+                            </div>
+                        </div>
+                    </div> 
+                `
+            })
+            
+            const  html = await htmls.join('')
+            await $('#getAllProducts').html(html)
+
+            navHtml = `
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                    Ngôn ngữ
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Việt Nam</a>
+                        <a class="dropdown-item" href="#">English</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link" data-toggle="modal" data-target="#loginModal">Đăng nhập</a>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link" data-toggle="modal" data-target="#signupModal">Đăng ký</a>
+                </li>
+            `
+            await $('#info').append(navHtml)
+            
+        })
+        .catch(function(error){
+            alert('có lỗi ở phần front end!!! ')
+            console.log(error)
+        })
+}
 
 const btnLogin = $('#loginForm')
 
@@ -111,55 +145,56 @@ if(btnLogin){
         event.preventDefault()
         await $("#loginModal").modal("hide");
         // Xử lý dữ liệu phản hồi ở đây
-        const { meta, resData: {accessToken} } = await login()
+        const { meta, resData: {user, accessToken} } = await login()
+        console.log(user)
         if (meta.ok === true){
             //set token vs timeExpired
             await instance.setCookieAccessToken(accessToken)
             alert(meta.message)
-            const { meta: metaInfo, resData: { infoUser } } = await getInfo();
-            console.log(infoUser)
-            if (metaInfo.ok === true){
-                navInfoHtml = `
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                        Ngôn ngữ
-                        </a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Việt Nam</a>
-                            <a class="dropdown-item" href="#">English</a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <img src="${infoUser.avatar}" alt="Ảnh avatar" class="user-avatar">
-                            ${infoUser.name}
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="">
-                                <span class="oi oi-person"></span>
-                                Your profile
-                            </a>
-                            <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="">
-                                    <span class="oi oi-question-mark"></span>
-                                    Help
-                                </a>
-                                <a class="dropdown-item" href="">
-                                    <span class="oi oi-cog"></span>
-                                    Setting
-                                </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">
-                                <span class="oi oi-account-logout"></span>
-                                Sign out
-                            </a>
-                        </div>
-                    </li>
-                `
-            await $('#info').html(navInfoHtml)
-            }
+            callInfo(user)
         }
     })
+}
+
+async function callInfo(user) {
+    navInfoHtml = `
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+            Ngôn ngữ
+            </a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">Việt Nam</a>
+                <a class="dropdown-item" href="#">English</a>
+            </div>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img src="${user.avatar}" alt="Ảnh avatar" class="user-avatar">
+                ${user.name}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="">
+                    <span class="oi oi-person"></span>
+                    Your profile
+                </a>
+                <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="">
+                        <span class="oi oi-question-mark"></span>
+                        Help
+                    </a>
+                    <a class="dropdown-item" href="">
+                        <span class="oi oi-cog"></span>
+                        Setting
+                    </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">
+                    <span class="oi oi-account-logout"></span>
+                    Sign out
+                </a>
+            </div>
+        </li>
+    `
+    await $('#info').html(navInfoHtml)
 }
 
 async function login() {
@@ -178,16 +213,11 @@ const btnSignup = $('#signupForm')
 if(btnSignup){
     btnSignup.on('submit', async (event) => {
         event.preventDefault()
-        // Xử lý dữ liệu phản hồi ở đây
         const { meta, resData } = await signup()
         if (meta.ok === true ) {
-            // Nếu đăng nhập thành công thì đưa đến trang  My profile
-            const currentPageURL = './indexLogged.html'
-            window.location.href = currentPageURL
-            alert(meta.message)
-        } else {
-            alert(meta.message)
-            $('#signupForm').innerHTML
+            alert(`${meta.message}, mời bạn đăng nhập tài khoản`);
+            $("#signupModal").modal("hide")
+            $("#loginModal").modal("show")
         }
     })
 }
@@ -223,14 +253,6 @@ if (btnGetAll) {
         const { meta, resData: allUsers } = await getAll()
         console.log(allUsers)
     })
-}
-
-// async function getAll() {
-//     return (await instance.get('user')).data
-// }
-
-async function getInfo() {
-    return (await instance.get('user')).data
 }
 
 async function refreshToken() {

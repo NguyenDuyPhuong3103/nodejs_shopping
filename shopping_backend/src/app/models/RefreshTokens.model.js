@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 // Create RefreshTokens model
 const refreshTokens = new Schema({
@@ -10,7 +10,6 @@ const refreshTokens = new Schema({
         type: mongoose.Types.ObjectId,
         ref: "users",
     }
-});
+})
 
-module.exports = mongoose.model('refreshTokens', refreshTokens);
-
+module.exports = mongoose.model('refreshTokens', refreshTokens)

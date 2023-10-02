@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 // Create Shops model
 const shops = new Schema({
@@ -9,14 +9,10 @@ const shops = new Schema({
     address: {type: String, required: true},
     description: String,
     user :  {type: Schema.Types.ObjectId, ref: 'users'},
-    categories:  [{
-        category: {type: Schema.Types.ObjectId, ref: 'categories'}
-    }],
-    products:[{
-        product: {type: Schema.Types.ObjectId, ref: 'Product'}
-    }],
+    categories:  [{type: Schema.Types.ObjectId, ref: 'categories'}],
+    products:[{type: Schema.Types.ObjectId, ref: 'products'}],
 }, {
     timestamps: true,
-});
+})
 
-module.exports = mongoose.model('shops', shops);
+module.exports = mongoose.model('shops', shops)

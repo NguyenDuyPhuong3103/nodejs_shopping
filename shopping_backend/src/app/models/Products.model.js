@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 // Create Products model
 const products = new Schema({
@@ -13,6 +13,6 @@ const products = new Schema({
     category:  {type: Schema.Types.ObjectId, ref: 'categories'},
 }, {
     timestamps: true,
-});
+})
 
-module.exports = mongoose.model('products', products);
+module.exports = mongoose.model('products', products)

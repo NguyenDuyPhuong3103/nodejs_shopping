@@ -1,13 +1,13 @@
-const jwt = require('jsonwebtoken');
-const {StatusCodes} = require('http-status-codes');
-const responseFormat = require('../../util/responseFormat.js');
+const jwt = require('jsonwebtoken')
+const {StatusCodes} = require('http-status-codes')
+const responseFormat = require('../../util/responseFormat.js')
 
 const signAccessToken = async (userId) => { 
     return new Promise ((resolve, reject) => {
         const payload ={
             userId,
         }
-        const secret = process.env.ACCESS_TOKEN_SECRET;
+        const secret = process.env.ACCESS_TOKEN_SECRET
         const options = {
             expiresIn: '1h' //10m 10s
         }
@@ -15,8 +15,8 @@ const signAccessToken = async (userId) => {
         jwt.sign(payload, secret, options, (err, token) => {
             if (err) reject(err)
             resolve(token)
-        });
-    });
+        })
+    })
 }
 
 const signRefreshToken = async (userId) => {
@@ -24,7 +24,7 @@ const signRefreshToken = async (userId) => {
         const payload ={
             userId
         }
-        const secret = process.env.REFRESH_TOKEN_SECRET;
+        const secret = process.env.REFRESH_TOKEN_SECRET
         const options = {
             expiresIn: '6m' //10m 10s
         }
@@ -32,31 +32,31 @@ const signRefreshToken = async (userId) => {
         jwt.sign(payload, secret, options, (err, token) => {
             if (err) reject(err)
             resolve(token)
-        });
-    });
+        })
+    })
 }
 
 const verifyAccessToken = async (req, res, next) => {
     if (!req.headers['authorization']) {
         return next( res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
             message: `Khong co authorization o phan header duoc gui len tu client!!!` 
-        })).end());
+        })).end())
     }
     console.log('da verify access token')
-    const authHeader = req.headers['authorization'];
-    const bearerToken = authHeader.split(' ');
-    const token = bearerToken[1];
+    const authHeader = req.headers['authorization']
+    const bearerToken = authHeader.split(' ')
+    const token = bearerToken[1]
     //verify access token
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if (err) {
             return res.status(StatusCodes.OK).json(responseFormat(false, { 
                 message: `co loi o phan verifyAccessToken, token khong hop le!!!`,
                 err: err,
-            })).end();
+            })).end()
         }
         //middlerware tiếp theo có thể dùng req.user để authorization
-        req.payload = payload;
-        next();
+        req.payload = payload
+        next()
     }) 
 }
 
@@ -67,11 +67,11 @@ const verifyRefreshToken = async (refreshToken) => {
             if (err) {
                 return next( res.status(StatusCodes.UNAUTHORIZED).json(responseFormat(false, { 
                 message: `co loi o phan verifyToken!!!` 
-            })).end());
+            })).end())
             }
-            resolve(payload);
-        });
-    });
+            resolve(payload)
+        })
+    })
 }
 
 

@@ -20,7 +20,6 @@ class CategoriesController {
             if (!categories || categories.length === 0 ) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong tim thay categories`,
-                    error: error,
                 }))
             }
             return res.status(StatusCodes.OK).json(responseFormat(true, { 
@@ -49,7 +48,6 @@ class CategoriesController {
             if (!category) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong tim thay category`,
-                    error: error,
                 }))
             }
             return res.status(StatusCodes.OK).json(responseFormat(true, { 
@@ -76,7 +74,6 @@ class CategoriesController {
             if (!category) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong tao duoc category`,
-                    error: error,
                 }))
             }
 
@@ -89,7 +86,6 @@ class CategoriesController {
             if (!updateShop) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc shop`,
-                    error: error,
                 }))
             }
 
@@ -117,7 +113,6 @@ class CategoriesController {
             if (!category) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc category`,
-                    error: error,
                 }))
             }
 
@@ -130,7 +125,6 @@ class CategoriesController {
             if (!updateShop) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc shop`,
-                    error: error,
                 }))
             }
 
@@ -158,7 +152,6 @@ class CategoriesController {
             if (!category) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong xoa duoc category`,
-                    error: error,
                 }))
             }
             return res.status(StatusCodes.OK).json(responseFormat(true, { 

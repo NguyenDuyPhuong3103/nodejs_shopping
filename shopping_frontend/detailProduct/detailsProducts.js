@@ -1,3 +1,18 @@
+//Create instance axios config
+const instance = axios.create({
+    baseURL: 'http://localhost:3000/api/',
+    timeout: 3 * 1000, //milliseconds,
+    withCredentials: true,
+    headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    }
+})
+
+async function detailProduct() {
+    return (await instance.get('products/' + URL)).data
+}
+
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, '\\$&');
@@ -10,10 +25,9 @@ function getParameterByName(name, url) {
 
 var URL = getParameterByName('id', window.location.href);
 
-var postApi ='http://localhost:3000/api/products/' + URL;
-fetch(postApi)
-    .then(response => response.json())
-    .then(product => {
+detailProduct()
+    .then(response => {
+        const product = response.resData
         var html = `
         <div>
             <h2>${product.name}</h2>

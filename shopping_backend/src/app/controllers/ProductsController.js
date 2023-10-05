@@ -9,94 +9,107 @@ const pageSize = 2
 class ProductsController {
 
     //[GET] /products
+    // async getAllProducts(req, res, next){
+    //     try {
+    //         let page = req.query.page
+
+    //         if (page) {
+    //             //get page
+    //             page = parseInt(page)
+    //             if (page < 1) {
+    //                 page = 1 
+    //             }
+                
+    //             const startPage = Math.max((page - 1) * pageSize, 0)
+
+    //             const products = await Product.find({})
+    //                 .populate('category')
+    //                 .populate('shop')
+    //                 .populate('user')
+    //                 .skip(startPage)
+    //                 .limit(pageSize)
+
+    //             if (!products) {
+    //                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+    //                     message: `Khong tim thay products`,
+    //                 }))
+    //             }
+
+    //             const total = await Product.countDocuments({})
+    //             if (!total) {
+    //                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+    //                     message: `Khong tim thay total`,
+    //                 }))
+    //             }
+
+    //             const totalPage = await Math.ceil(total / pageSize)
+    //             if (!totalPage) {
+    //                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+    //                     message: `Khong tim thay totalPage`,
+    //                 }))
+    //             }
+
+    //             const resData = {
+    //                 pageSize: pageSize,
+    //                 total: total,
+    //                 totalPage: totalPage,
+    //                 data: products,
+    //             }
+
+    //             return res.status(StatusCodes.OK).json(responseFormat(true, { 
+    //                 message: `Tim thay tất cả product`
+    //             },resData))
+
+    //         } else {
+    //             const products = await Product.find({})
+    //                 .populate('category')
+    //                 .populate('shop')
+    //                 .populate('user')
+    //             if (!products || products.length === 0 ) {
+    //                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+    //                     message: `Khong tim thay products`,
+    //                 }))
+    //             }
+    //             return res.status(StatusCodes.OK).json(responseFormat(true, { 
+    //                 message: `Tim thay products`
+    //             },products))
+    //         }
+    //     } catch (error) {
+    //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+    //             message: `Co loi o server getAllProducts`,
+    //             error: error, 
+    //         }))
+    //     }
+    // }
+
     async getAllProducts(req, res, next){
         try {
-            var page = req.query.page
+            const {
+                page = 1, 
+                limit = 10, 
+                sort = "createdAt", 
+                order = "asc"
+            } = req.query
 
-        if (page) {
-            //get page
-            page = parseInt(page)
-            if (page < 1) {
-                page = 1 
-            }
-            // var startPage = (page - 1) * pageSize
-
-            // Product.find({}).populate('category')
-            //     .skip(startPage)
-            //     .limit(pageSize)
-            //     .then(products => {
-            //         Product.countDocuments({})
-            //             .then((total) => {
-            //                 var totalPage = Math.ceil(total / pageSize)
-            //                 res.json({
-            //                     pageSize: pageSize,
-            //                     total: total,
-            //                     totalPage: totalPage,
-            //                     data: products,
-            //                 })
-            //             })
-            //     })
-            //     .catch(next)
-            
-            const startPage = Math.max((page - 1) * pageSize, 0)
-
-            const products = await Product.find({})
-                .populate('category')
-                .populate('shop')
-                .populate('user')
-                .skip(startPage)
-                .limit(pageSize)
-
-            if (!products) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-                    message: `Khong tim thay products`,
-                    error: error,
-                }))
+            const options = {
+                page,
+                limit,
+                sort: {
+                    [sort] : order === "asc" ? 1 : -1
+                },
+                populate: ['category', 'shop', 'user']
             }
 
-            const total = await Product.countDocuments({})
-            if (!total) {
+            const data = await Product.paginate({}, options)
+            console.log(data)
+            if (!data.docs || data.docs.length === 0 ) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-                    message: `Khong tim thay total`,
-                    error: error,
-                }))
-            }
-
-            const totalPage = await Math.ceil(total / pageSize)
-            if (!totalPage) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-                    message: `Khong tim thay totalPage`,
-                    error: error,
-                }))
-            }
-
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
-                message: `Tim thay tất cả product`
-            },{
-                pageSize: pageSize,
-                total: total,
-                totalPage: totalPage,
-                data: products,
-            }))
-
-        } else {
-            // Product.find({})
-            //     .then(products => res.json(products))
-            //     .catch(next)
-            const products = await Product.find({})
-                .populate('category')
-                .populate('shop')
-                .populate('user')
-            if (!products || products.length === 0 ) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-                    message: `Khong tim thay products`,
-                    error: error,
+                    message: `Khong tim thay data`,
                 }))
             }
             return res.status(StatusCodes.OK).json(responseFormat(true, { 
-                message: `Tim thay products`
-            },products))
-        }
+                message: `Tim thay data`
+            },data))
         } catch (error) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
                 message: `Co loi o server getAllProducts`,
@@ -106,12 +119,6 @@ class ProductsController {
     }
 
     //[GET] /products/:id
-    // getProductById(req, res, next) {
-    //     Product.findOne({ _id: req.params.id}).populate('category')
-    //         .then(product => res.json(product))
-    //         .catch(next)   
-    // }
-
     async getProductById(req, res, next){
         try {
             const product = await Product.findById(req.params.id)
@@ -121,7 +128,6 @@ class ProductsController {
             if (!product) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong tim thay product`,
-                    error: error,
                 }))
             }
             return res.status(StatusCodes.OK).json(responseFormat(true, { 
@@ -136,19 +142,12 @@ class ProductsController {
     }
 
     // [POST] /products
-    // createProduct(req, res, next) {
-    //     Product.create(req.body)
-    //         .then(product => res.json(product))
-    //         .catch(next)
-    // }
-
     async createProduct(req, res, next){
         try {
             const product = await Product.create(req.body)
             if (!product) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong tao duoc product`,
-                    error: error,
                 }))
             }
 
@@ -161,7 +160,6 @@ class ProductsController {
             if (!updateCategory) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc category`,
-                    error: error,
                 }))
             }
 
@@ -174,7 +172,6 @@ class ProductsController {
             if (!updateShop) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc shop`,
-                    error: error,
                 }))
             }
 
@@ -187,7 +184,6 @@ class ProductsController {
             if (!updateUser) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc user`,
-                    error: error,
                 }))
             }
 
@@ -204,19 +200,12 @@ class ProductsController {
     }
 
     // [PUT] /products
-    // editProductById(req, res, next) {
-    //     Product.updateOne({ _id: req.params.id}, req.body)
-    //         .then(product => res.json(product))
-    //         .catch(next)
-    // }
-
     async editProductById(req, res, next){
         try {
             const product = await Product.findByIdAndUpdate(req.params.id, req.body, {new: true})
             if (!product) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc product`,
-                    error: error,
                 }))
             }
 
@@ -229,7 +218,6 @@ class ProductsController {
             if (!updateCategory) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc category`,
-                    error: error,
                 }))
             }
 
@@ -242,7 +230,6 @@ class ProductsController {
             if (!updateShop) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc shop`,
-                    error: error,
                 }))
             }
 
@@ -255,7 +242,6 @@ class ProductsController {
             if (!updateUser) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc user`,
-                    error: error,
                 }))
             }
 
@@ -272,31 +258,23 @@ class ProductsController {
     }
 
     // [DELETE] /products/:id
-    deleteProduct(req, res, next) {
-        Product.deleteOne({ _id: req.params.id})
-            .then(product => res.json(product))
-            .catch(next)
+    async deleteProduct(req, res, next){
+        try {
+            const product = await Product.findByIdAndDelete(req.params.id)
+            if (!product) {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                    message: `Khong xoa duoc product`,
+                }))
+            }
+            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+                message: `Xoa thanh cong product`
+            },product))
+        } catch (error) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+                message: `Co loi o server deleteProduct`,
+            }))
+        }
     }
-
-    // async deleteProduct(req, res, next){
-    //     try {
-    //         const product = await Product.findByIdAndDelete(req.params.id)
-    //         if (!product) {
-    //             return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-    //                 message: `Khong xoa duoc product`,
-    //                 error: error,
-    //             }))
-    //         }
-    //         return res.status(StatusCodes.OK).json(responseFormat(true, { 
-    //             message: `Xoa thanh cong product`
-    //         },product))
-    //     } catch (error) {
-    //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
-    //             message: `Co loi o server deleteProduct`,
-    //             error: error, 
-    //         }))
-    //     }
-    // }
 }
 
 module.exports = new ProductsController

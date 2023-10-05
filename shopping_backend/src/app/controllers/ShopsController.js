@@ -21,7 +21,6 @@ class ShopsController {
             if (!shops || shops.length === 0 ) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong tim thay shops`,
-                    error: error,
                 }))
             }
             return res.status(StatusCodes.OK).json(responseFormat(true, { 
@@ -51,7 +50,6 @@ class ShopsController {
             if (!shop) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong tim thay shop`,
-                    error: error,
                 }))
             }
             return res.status(StatusCodes.OK).json(responseFormat(true, { 
@@ -91,7 +89,6 @@ class ShopsController {
             if (!updateUser) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc user`,
-                    error: error,
                 }))
             }
 
@@ -119,7 +116,6 @@ class ShopsController {
             if (!shop) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc shop`,
-                    error: error,
                 }))
             }
 
@@ -132,7 +128,6 @@ class ShopsController {
             if (!updateUser) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong cap nhat duoc user`,
-                    error: error,
                 }))
             }
 
@@ -160,7 +155,6 @@ class ShopsController {
             if (!shop) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
                     message: `Khong xoa duoc shop`,
-                    error: error,
                 }))
             }
             return res.status(StatusCodes.OK).json(responseFormat(true, { 

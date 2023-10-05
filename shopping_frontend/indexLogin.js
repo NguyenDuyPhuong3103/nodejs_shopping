@@ -52,90 +52,53 @@ instance.interceptors.response.use( async(response) => {
 //truoc khi login/ sign up
 
 // nếu đã login và trở về lại trang chủ thì kiểm tra xem AT có còn không? Nếu còn thì gọi hàm callInfo()
-// const oldAccessToken = getCookie("accessToken")
-// if (oldAccessToken) {
-//     callInfo()
-//     instance.get('products')
-//         .then(async response => {
-//             const products = response.data
-//             const htmls = products.map(function(product){
-//                 return `
-//                     <div class="col-sm-6 col-lg-4">
-//                         <div class="card card-course-item">
-//                             <a href="./detailProduct/detailsProducts.html?id=${product._id}">
-//                                 <img class="card-img-top" src="${product.image}" alt="${product.name}">
-//                             </a>
-//                             <div class="card-body">
-//                                 <a href="./detailProduct/detailsProducts.html?id=${product._id}">
-//                                     <h5 class="card-title">${product.name}</h5>
-//                                 </a>
-//                                 <a href="./detailProduct/detailsProducts.html?id=${product._id}" class="btn btn-primary">Details</a>
-//                             </div>
-//                         </div>
-//                     </div> 
-//                 `
-//             })
-            
-//             const  html = await htmls.join('')
-//             await $('#getAllProducts').html(html)
-//         })
-//         .catch(function(error){
-//             alert('có lỗi ở phần front end!!! ')
-//             console.log(error)
-//         })
-// } else {
-//     getNav()
-// }
 getNav()
 async function getNav() {
-    instance.get('products')
-        .then(async response => {
-            const products = response.data
-            const htmls = products.map(function(product){
-                return `
-                    <div class="col-sm-6 col-lg-4">
-                        <div class="card card-course-item">
+    const response = await instance.get('products')
+    const { meta, resData : products} = response.data
+    if (meta.ok === true) {
+        const htmls = products.map(function(product){
+            return `
+                <div class="col-sm-6 col-lg-4">
+                    <div class="card card-course-item">
+                        <a href="./detailProduct/detailsProducts.html?id=${product._id}">
+                            <img class="card-img-top" src="${product.image}" alt="${product.name}">
+                        </a>
+                        <div class="card-body">
                             <a href="./detailProduct/detailsProducts.html?id=${product._id}">
-                                <img class="card-img-top" src="${product.image}" alt="${product.name}">
+                                <h5 class="card-title">${product.name}</h5>
                             </a>
-                            <div class="card-body">
-                                <a href="./detailProduct/detailsProducts.html?id=${product._id}">
-                                    <h5 class="card-title">${product.name}</h5>
-                                </a>
-                                <a href="./detailProduct/detailsProducts.html?id=${product._id}" class="btn btn-primary">Details</a>
-                            </div>
+                            <a href="./detailProduct/detailsProducts.html?id=${product._id}" class="btn btn-primary">Details</a>
                         </div>
-                    </div> 
-                `
-            })
-            
-            const  html = await htmls.join('')
-            await $('#getAllProducts').html(html)
-
-            navHtml = `
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                    Ngôn ngữ
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">Việt Nam</a>
-                        <a class="dropdown-item" href="#">English</a>
                     </div>
-                </li>
-                <li class="nav-item">
-                    <a href="" class="nav-link" data-toggle="modal" data-target="#loginModal">Đăng nhập</a>
-                </li>
-                <li class="nav-item">
-                    <a href="" class="nav-link" data-toggle="modal" data-target="#signupModal">Đăng ký</a>
-                </li>
+                </div> 
             `
-            await $('#info').append(navHtml)
-            
         })
-        .catch(function(error){
-            alert('có lỗi ở phần front end!!! ')
-            console.log(error)
-        })
+        
+        const  html = await htmls.join('')
+        await $('#getAllProducts').html(html)
+    
+        navHtml = `
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                Ngôn ngữ
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Việt Nam</a>
+                    <a class="dropdown-item" href="#">English</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="" class="nav-link" data-toggle="modal" data-target="#loginModal">Đăng nhập</a>
+            </li>
+            <li class="nav-item">
+                <a href="" class="nav-link" data-toggle="modal" data-target="#signupModal">Đăng ký</a>
+            </li>
+        `
+        await $('#info').append(navHtml)
+    } else {
+        resData.error
+    }
 }
 
 const btnLogin = $('#loginForm')
@@ -157,6 +120,8 @@ if(btnLogin){
 }
 
 async function callInfo(user) {
+    console.log(user._id)
+    console.log($('#info'))
     navInfoHtml = `
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">

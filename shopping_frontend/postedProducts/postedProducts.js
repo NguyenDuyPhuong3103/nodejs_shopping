@@ -1,8 +1,21 @@
-var postApi ='http://localhost:3000/api/products/AllPostedProducts';
+//Create instance axios config
+const instance = axios.create({
+    baseURL: 'http://localhost:3000/api/',
+    timeout: 3 * 1000, //milliseconds,
+    withCredentials: true,
+    headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    }
+})
 
-fetch(postApi)
-    .then(response => response.json())
-    .then(products => {
+async function getAllProducts(productId) {
+    return (await instance.get('products')).data
+}
+
+getAllProducts()
+    .then(response => {
+        const products = response.resData
         var htmls = products.map(function(product, index){
             return `
                 <tr>
@@ -17,47 +30,53 @@ fetch(postApi)
                         <a href="" class="btn btn-primary" data-id="${product._id}" data-toggle="modal" data-target="#deleteProductModal">Delete</a>
                     </td>    
                 </tr>
-            `;
-        });
+            `
+        })
         
-        var html = htmls.join('');
-        document.getElementById('postedProducts').innerHTML = html;
+        var html = htmls.join('')
+        document.getElementById('postedProducts').innerHTML = html
     })
     .catch(function(error){
-        alert('There was a mistake!!!');
-    });
+        alert('There was a mistake!!!')
+    })
 
 //Delete product
 
-var productId;
+var productId
 
 $('#deleteProductModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget);
-    productId = button.data('id');
+    var button = $(event.relatedTarget)
+    productId = button.data('id')
 })
 
-var btnDeleteProduct = $('#btn-delete-product');
+var btnDeleteProduct = $('#btn-delete-product')
 
 btnDeleteProduct.on( "click", function( event ) {
-    deleteProduct(productId);
-});
+    deleteProduct(productId)
+})
 
 
-function deleteProduct(productId) {
-    var options = {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    };
-    fetch('http://localhost:3000/api/products/' + productId, options)
-        .then(res =>res.clone().json())
-        .then(data => {
-            const newPageURL = '../postedProducts/postedProducts.html';
-            window.location.href = newPageURL;
+//Delete product
+        
+var productId
+        
+$('#deleteProductModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget)
+    productId = button.data('id')
+})
+
+var btnDeleteProduct = $('#btn-delete-product')
+
+btnDeleteProduct.on( "click", function( event ) {
+    deleteProduct(productId)
+        .then(response => {
+            console.log(response)
+            alert(`Ban da xoa thanh cong ${response.resData.name}`)
+            // const newPageURL = '/shopping_frontend/admin.html'
+            // window.location.href = newPageURL
         }
             )
         .catch(error => {
-            alert('Can not delete product');
-        });
-}
+            alert('Can not delete product')
+        })
+})

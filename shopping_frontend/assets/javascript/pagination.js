@@ -1,10 +1,30 @@
 var currentPage = 1;
+//Create instance axios config
+const instance = axios.create({
+    baseURL: 'http://localhost:3000/api/',
+    timeout: 3 * 1000, //milliseconds,
+    withCredentials: true,
+    headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    }
+})
 
-function generateProductHtml(products, currentPage) {
-    var htmls = products.data.map(function(product, index){
+async function pagination() {
+    return (await instance.get('products?page=' + currentPage)).data
+}
+
+async function deleteProduct(productId) {
+    return (await instance.delete('products/' + productId)).data
+}
+
+
+function generateProductHtml(resData, currentPage) {
+    const products = resData.data
+    var htmls = products.map(function(product, index){
         return `
             <tr>
-                <th scope="row">${(currentPage - 1) * products.pageSize + index + 1}</th>
+                <th scope="row">${(currentPage - 1) * resData.pageSize + index + 1}</th>
                 <td>
                     <a class="details" href="./detailProduct/detailsProducts.html?id=${product._id}">${product.name}</a>
                 </td>
@@ -22,15 +42,14 @@ function generateProductHtml(products, currentPage) {
     $('#postedProducts').html(html);
 }
 
-$.ajax({
-    url: 'http://localhost:3000/api/products?page=' + currentPage,
-    method: 'GET'
-})
-    .then(products => {
+pagination()
+    .then(response  => {
+        const { meta, resData } = response
+        const products = resData.data
         $('.pagination').append(`<li class="page-item"><a class="page-link page-pre" href="#">Previous</a></li>`);
 
         // Tạo vòng lặp để hiển thị các nút bấm số trang
-        for (var i = 1; i <= parseInt(products.totalPage); i++) {
+        for (var i = 1; i <= parseInt(resData.totalPage); i++) {
             var liClass = 'page-item';
             var liContent = `<a class="page-link page-number" href="#">${i}</a>`;
             $('.pagination').append(`<li class="${liClass}">${liContent}</li>`);
@@ -38,25 +57,23 @@ $.ajax({
 
         $('.pagination').append(`<li class="page-item"><a class="page-link page-next" href="#">Next</a></li>`);
     })
-    .catch(error => console.log('co loi sai o phan pagination.js'))
+    .catch(error => console.log(error))
     .then(() => {
-        $.ajax({
-            url: 'http://localhost:3000/api/products?page=' + currentPage,
-            method: 'GET'
-        })
-            .then(products => {
-                generateProductHtml(products, currentPage);
-            })
-            .catch(error => console.log('co loi sai o phan pagination.js'));
+        pagination()
+            .then(response  => {
+                const { meta, resData } = response
+                const products = resData.data
+                    generateProductHtml(resData, currentPage);
+                })
+            .catch(error => console.log(error));
         
         $("a.page-number").on( "click", function () {
             currentPage = $(this).html();
-            $.ajax({
-                url: 'http://localhost:3000/api/products?page=' + $(this).html(),
-                method: 'GET'
-            })
-                .then(products => {
-                    generateProductHtml(products, currentPage);
+            pagination()
+            .then(response  => {
+                const { meta, resData } = response
+                const products = resData.data
+                    generateProductHtml(resData, currentPage);
                 })
                 .catch(error => console.log('co loi sai o phan pagination.js'));    
         });
@@ -65,18 +82,17 @@ $.ajax({
         $("a.page-next").on( "click", function () {
             currentPage++;
             $("li.page-item a.page-pre").removeClass("disabled").css("pointer-events", "auto");
-            $.ajax({
-                url: 'http://localhost:3000/api/products?page=' + currentPage,
-                method: 'GET'
-            })
-                .then(products => {
-                    if (currentPage > parseInt(products.totalPage)){
+            pagination()
+            .then(response  => {
+                const { meta, resData } = response
+                const products = resData.data
+                    if (currentPage > parseInt(resData.totalPage)){
                         alert('It is a last page!!!');
                         currentPage--;
                         $("li.page-item a.page-next").addClass("disabled").css("pointer-events", "none");
                     } else {
                         $("li.page-item a.page-next").removeClass("disabled").css("pointer-events", "auto");
-                        generateProductHtml(products, currentPage);
+                        generateProductHtml(resData, currentPage);
                     }
                 })
                 .catch(error => console.log('co loi sai o phan pagination.js'));
@@ -86,18 +102,17 @@ $.ajax({
             currentPage--;
             $("li.page-item a.page-next").removeClass("disabled").css("pointer-events", "auto");
             
-            $.ajax({
-                url: 'http://localhost:3000/api/products?page=' + currentPage,
-                method: 'GET'
-            })
-                .then(products => {
+            pagination()
+            .then(response  => {
+                const { meta, resData } = response
+                const products = resData.data
                     if (currentPage < 1){
                         alert('Can not previous page !!!');
                         currentPage++;
                         $("li.page-item a.page-pre").addClass("disabled").css("pointer-events", "none");
                     } else {
                         $("li.page-item a.page-pre").removeClass("disabled").css("pointer-events", "auto");
-                        generateProductHtml(products, currentPage);
+                        generateProductHtml(resData, currentPage);
                     }
                 })
                 .catch(error => console.log('co loi sai o phan pagination.js'));
@@ -116,26 +131,16 @@ $.ajax({
         var btnDeleteProduct = $('#btn-delete-product');
         
         btnDeleteProduct.on( "click", function( event ) {
-            deleteProduct(productId);
-        });
-        
-        function deleteProduct(productId) {
-            var options = {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            };
-            fetch('http://localhost:3000/api/products/' + productId, options)
-                .then(res =>res.clone().json())
-                .then(data => {
-                    const newPageURL = '/shopping_frontend/index.html';
-                    window.location.href = newPageURL;
+            deleteProduct(productId)
+                .then(response => {
+                    console.log(response)
+                    alert(`Ban da xoa thanh cong ${response.resData.name}`)
+                    // const newPageURL = '/shopping_frontend/admin.html';
+                    // window.location.href = newPageURL;
                 }
                     )
                 .catch(error => {
                     alert('Can not delete product');
-                });
-        }
-        
+                })
+        });
     });

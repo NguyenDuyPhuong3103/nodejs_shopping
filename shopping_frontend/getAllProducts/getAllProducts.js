@@ -1,8 +1,21 @@
-var AllProductsApi ='http://localhost:3000/api/products';
+//Create instance axios config
+const instance = axios.create({
+    baseURL: 'http://localhost:3000/api/',
+    timeout: 3 * 1000, //milliseconds,
+    withCredentials: true,
+    headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    }
+})
 
-fetch(AllProductsApi)
-    .then(response => response.json())
-    .then(products => {
+async function getAllProducts(productId) {
+    return (await instance.get('products')).data
+}
+
+getAllProducts()
+    .then(response => {
+        const products = response.resData
         var htmls = products.map(function(product){
                 return `
                     <div class="col-sm-6 col-lg-4">

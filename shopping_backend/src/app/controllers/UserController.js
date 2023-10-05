@@ -54,7 +54,7 @@ class UserController {
             if (!user) {
                 return res.status(StatusCodes.OK).json(responseFormat(false, { 
                     message: `email hoac password sai, vui long nhap lai!!!` 
-                })).end()
+                }))
             }
 
             const isValid = await user.isCheckPassword(password)
@@ -62,7 +62,7 @@ class UserController {
             if (!isValid) {
                 return res.status(StatusCodes.OK).json(responseFormat(false, { 
                     message: `email hoac password sai, vui long nhap lai!!!` 
-                })).end()
+                }))
             }
 
             const accessToken = await signAccessToken(user._id)
@@ -92,12 +92,12 @@ class UserController {
             }, {
                 user,
                 accessToken
-            })).end()
+            }))
         } catch (error) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
                 message: `Co loi o server login`,
                 error: error, 
-            })).end()
+            }))
         }
     }
 
@@ -112,7 +112,7 @@ class UserController {
             if (!refreshToken){
                 return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { 
                     message: `Khong tim thay refreshToken trong cookie o server!!` 
-                })).end()
+                }))
             }
 
             const {userId} = await verifyRefreshToken(refreshToken)
@@ -121,7 +121,7 @@ class UserController {
             if (!findToken){
                 return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { 
                     message: `refreshToken khong hop le!!` 
-                })).end()
+                }))
             } else {
                 const accessToken = await signAccessToken(userId)
                 const newRef = await signRefreshToken(userId)
@@ -136,13 +136,13 @@ class UserController {
                 return res.status(StatusCodes.OK).json(responseFormat(true, { 
                     message: `Refresh Token thanh cong!!!`},{
                         accessToken
-                    })).end()
+                    }))
             }
         } catch (error) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
                 message: `Co loi o server refreshToken`,
                 error: error, 
-            })).end()
+            }))
         }
     }
 
@@ -159,13 +159,13 @@ class UserController {
             } else {
                 return res.status(StatusCodes.	NOT_FOUND).json(responseFormat(false, { 
                     message: `Co loi o server logout, khong tim thay refreshToken`,
-                })).end()
+                }))
             }
         } catch (error) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
                 message: `Co loi o server Log out`,
                 error: error, 
-            })).end()
+            }))
         }
     }
 

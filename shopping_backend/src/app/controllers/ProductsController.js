@@ -9,7 +9,7 @@ const pageSize = 2
 class ProductsController {
 
     //[GET] /products
-    // async getAllProducts(req, res, next){
+    // async getProducts(req, res, next){
     //     try {
     //         let page = req.query.page
 
@@ -82,38 +82,53 @@ class ProductsController {
     //     }
     // }
 
-    async getAllProducts(req, res, next){
+    async getProducts(req, res, next){
         try {
-            const {
-                page = 1, 
-                limit = 10, 
-                sort = "createdAt", 
-                order = "asc"
-            } = req.query
-
-            const options = {
-                page,
-                limit,
-                sort: {
-                    [sort] : order === "asc" ? 1 : -1
-                },
-                populate: ['category', 'shop', 'user']
+            const page = req.query.page
+            
+            if (page) {
+                const {
+                    // page = 1, 
+                    limit = 2, 
+                    sort = "createdAt", 
+                    order = "asc"
+                } = req.query
+                console.log('da vao day')
+                const options = {
+                    page,
+                    limit,
+                    sort: {
+                        [sort] : order === "asc" ? 1 : -1
+                    },
+                    populate: ['category', 'shop', 'user']
+                }
+    
+                const data = await Product.paginate({}, options)
+                console.log(data)
+                if (!data.docs || data.docs.length === 0 ) {
+                    return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                        message: `Khong tim thay data`,
+                    }))
+                }
+                return res.status(StatusCodes.OK).json(responseFormat(true, { 
+                    message: `Tim thay data`
+                },data))
+            } else {
+                const data = await Product.find({})
+                if (!data.docs || data.docs.length === 0 ) {
+                    return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                        message: `Khong tim thay data`,
+                    }))
+                }
+                return res.status(StatusCodes.OK).json(responseFormat(true, { 
+                    message: `Tim thay data`
+                },data))
             }
-
-            const data = await Product.paginate({}, options)
-            console.log(data)
-            if (!data.docs || data.docs.length === 0 ) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-                    message: `Khong tim thay data`,
-                }))
-            }
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
-                message: `Tim thay data`
-            },data))
+            
         } catch (error) {
+            console.log(error) 
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
                 message: `Co loi o server getAllProducts`,
-                error: error, 
             }))
         }
     }
@@ -200,7 +215,7 @@ class ProductsController {
     }
 
     // [PUT] /products
-    async editProductById(req, res, next){
+    async updateProductById(req, res, next){
         try {
             const product = await Product.findByIdAndUpdate(req.params.id, req.body, {new: true})
             if (!product) {

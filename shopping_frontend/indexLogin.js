@@ -55,7 +55,8 @@ instance.interceptors.response.use( async(response) => {
 getNav()
 async function getNav() {
     const response = await instance.get('products')
-    const { meta, resData : products} = response.data
+    console.log(response)
+    const { meta, resData : products} = response
     if (meta.ok === true) {
         const htmls = products.map(function(product){
             return `

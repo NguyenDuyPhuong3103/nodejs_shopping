@@ -20,11 +20,11 @@ async function deleteProduct(productId) {
 
 
 function generateProductHtml(resData, currentPage) {
-    const products = resData.data
+    const products = resData.docs
     var htmls = products.map(function(product, index){
         return `
             <tr>
-                <th scope="row">${(currentPage - 1) * resData.pageSize + index + 1}</th>
+                <th scope="row">${(currentPage - 1) * resData.limit + index + 1}</th>
                 <td>
                     <a class="details" href="./detailProduct/detailsProducts.html?id=${product._id}">${product.name}</a>
                 </td>
@@ -44,8 +44,9 @@ function generateProductHtml(resData, currentPage) {
 
 pagination()
     .then(response  => {
+        console.log(response)
         const { meta, resData } = response
-        const products = resData.data
+        const products = resData.docs
         $('.pagination').append(`<li class="page-item"><a class="page-link page-pre" href="#">Previous</a></li>`);
 
         // Tạo vòng lặp để hiển thị các nút bấm số trang
@@ -62,7 +63,7 @@ pagination()
         pagination()
             .then(response  => {
                 const { meta, resData } = response
-                const products = resData.data
+                const products = resData.docs
                     generateProductHtml(resData, currentPage);
                 })
             .catch(error => console.log(error));
@@ -72,7 +73,7 @@ pagination()
             pagination()
             .then(response  => {
                 const { meta, resData } = response
-                const products = resData.data
+                const products = resData.docs
                     generateProductHtml(resData, currentPage);
                 })
                 .catch(error => console.log('co loi sai o phan pagination.js'));    
@@ -85,17 +86,16 @@ pagination()
             pagination()
             .then(response  => {
                 const { meta, resData } = response
-                const products = resData.data
-                    if (currentPage > parseInt(resData.totalPage)){
-                        alert('It is a last page!!!');
-                        currentPage--;
-                        $("li.page-item a.page-next").addClass("disabled").css("pointer-events", "none");
-                    } else {
-                        $("li.page-item a.page-next").removeClass("disabled").css("pointer-events", "auto");
-                        generateProductHtml(resData, currentPage);
-                    }
+                const products = resData.docs
+                $("li.page-item a.page-next").removeClass("disabled").css("pointer-events", "auto");
+                generateProductHtml(resData, currentPage);
                 })
-                .catch(error => console.log('co loi sai o phan pagination.js'));
+            .catch(error => { 
+                alert('It is a last page!!!');
+                currentPage--;
+                $("li.page-item a.page-next").addClass("disabled").css("pointer-events", "none");  
+            }
+            );
         });
         
         $("a.page-pre").on( "click", function () {
@@ -105,7 +105,7 @@ pagination()
             pagination()
             .then(response  => {
                 const { meta, resData } = response
-                const products = resData.data
+                const products = resData.docs
                     if (currentPage < 1){
                         alert('Can not previous page !!!');
                         currentPage++;

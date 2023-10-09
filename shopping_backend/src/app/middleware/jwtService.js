@@ -57,7 +57,7 @@ const verifyAccessToken = async (req, res, next) => {
         //middlerware tiếp theo có thể dùng req.user để authorization
         req.payload = payload
         next()
-    }) 
+    })
 }
 
 const verifyRefreshToken = async (refreshToken) => {

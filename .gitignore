@@ -2,6 +2,6 @@ shopping_backend/.vscode
 
 shopping_backend/node_modules/
 
-shopping_backend/src/config/cloudinary
+shopping_backend/src/config/cloudinary/
 
 shopping_backend/package-lock.jsons

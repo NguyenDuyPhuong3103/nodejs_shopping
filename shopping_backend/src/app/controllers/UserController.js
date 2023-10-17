@@ -11,10 +11,7 @@ class UserController {
         try {
             const { email, password } = req.body
 
-            const isExits = await User.findOne({
-                email
-            })
-
+            const isExits = await User.findOne({email})
             if (isExits) {
                 return res.status(StatusCodes.OK).json(responseFormat(false, { 
                     message: `${email} da ton tai, vui long nhap email khac!!!` 

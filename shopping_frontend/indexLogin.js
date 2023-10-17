@@ -33,9 +33,9 @@ instance.interceptors.response.use( async(response) => {
         //step 1: get token from refreshToken
         const { meta, resData : {accessToken} } = await refreshToken()
         if (accessToken){
-            //step 2: 
+            //step 2:
             config.headers['authorization'] = `Bearer ${accessToken}`
-            //step 3: 
+            //step 3:
             await instance.setCookieAccessToken(accessToken)
 
             return instance(config)

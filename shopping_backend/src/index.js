@@ -36,7 +36,6 @@ const baseRouter = require('./routes/index.route');
 const db = require('./config/db/index.db');
 const { Console } = require('console');
 
-
 // parse application/json
 app.use(bodyParser.json())
 

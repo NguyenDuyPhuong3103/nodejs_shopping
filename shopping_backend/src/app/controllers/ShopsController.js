@@ -6,12 +6,6 @@ const {StatusCodes} = require('http-status-codes')
 class ShopsController {
 
     //[GET] /shops
-    // getAllShops(req, res, next){
-    //     Shop.find({})
-    //         .then(shops => res.json(shops))
-    //         .catch(next)
-    // }
-
     async getAllShops(req, res, next){
         try {
             const shops = await Shop.find({})
@@ -35,12 +29,6 @@ class ShopsController {
     }
 
     //[GET] /shops/:id
-    // getShopById(req, res, next) {
-    //     Shop.findOne({ _id: req.params.id})
-    //         .then(shop => res.json(shop))
-    //         .catch(next)   
-    // }
-
     async getShopById(req, res, next){
         try {
             const shop = await Shop.findById(req.params.id)
@@ -64,12 +52,6 @@ class ShopsController {
     }
 
     // [POST] /shops
-    // createShop(req, res, next) {
-    //     Shop.create(req.body)
-    //         .then(shop => res.json(shop))
-    //         .catch(next)
-    // }
-
     async createShop(req, res, next){
         try {
             const shop = await Shop.create(req.body)
@@ -104,12 +86,6 @@ class ShopsController {
     }
 
     // [PUT] /shops
-    // editShopById(req, res, next) {
-    //     Shop.updateOne({ _id: req.params.id}, req.body)
-    //         .then(shop => res.json(shop))
-    //         .catch(next)
-    // }
-
     async editShopById(req, res, next){
         try {
             const shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {new: true})
@@ -143,12 +119,6 @@ class ShopsController {
     }
 
     // [DELETE] /shops/:id
-    // deleteShop(req, res, next) {
-    //     Shop.deleteOne({ _id: req.params.id})
-    //         .then(shop => res.json(shop))
-    //         .catch(next)
-    // }
-
     async deleteShop(req, res, next){
         try {
             const shop = await Shop.findByIdAndDelete(req.params.id)

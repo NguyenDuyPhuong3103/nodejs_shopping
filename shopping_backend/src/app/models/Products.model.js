@@ -4,13 +4,13 @@ const Schema = mongoose.Schema
 
 // Create Products model
 const products = new Schema({
-    name: {type: String, required: true},
-    image: String,
-    images: [String], 
-    description: String,
-    classification: String,
-    price: {type: String, required: true},
-    user :  {type: Schema.Types.ObjectId, ref: 'users'},
+    title: {type: String, required: true },
+    price: {type: String, default: '0' },
+    color: {type: String, default: 'undefined' },
+    sizes: [{type: String, default: [] }],
+    images: [{type: String, default: [] }],
+    description: [{type: String, default: [] }],
+    user:  {type: Schema.Types.ObjectId, ref: 'users'},
     shop:  {type: Schema.Types.ObjectId, ref: 'shops'},
     category:  {type: Schema.Types.ObjectId, ref: 'categories'},
 }, {

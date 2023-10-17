@@ -6,12 +6,6 @@ const {StatusCodes} = require('http-status-codes')
 class CategoriesController {
 
     //[GET] /categories
-    // getAllCategories(req, res, next){
-    //     Category.find({})
-    //         .then(categories => res.json(categories))
-    //         .catch(next)
-    // }
-
     async getAllCategories(req, res, next){
         try {
             const categories = await Category.find({})
@@ -34,12 +28,6 @@ class CategoriesController {
     }
 
     //[GET] /categories/:id
-    // getCategoryById(req, res, next) {
-    //     Category.findOne({ _id: req.params.id})
-    //         .then(category => res.json(category))
-    //         .catch(next)   
-    // }
-
     async getCategoryById(req, res, next){
         try {
             const category = await Category.findById(req.params.id)
@@ -62,12 +50,6 @@ class CategoriesController {
     }
 
     // [POST] /categories
-    // createCategory(req, res, next) {
-    //     Category.create(req.body)
-    //         .then(category => res.json(category))
-    //         .catch(next)
-    // }
-
     async createCategory(req, res, next){
         try {
             const category = await Category.create(req.body)
@@ -101,12 +83,6 @@ class CategoriesController {
     }
 
     // [PUT] /categories
-    // editCategoryById(req, res, next) {
-    //     Category.updateOne({ _id: req.params.id}, req.body)
-    //         .then(category => res.json(category))
-    //         .catch(next)
-    // }
-
     async editCategoryById(req, res, next){
         try {
             const category = await Category.findByIdAndUpdate(req.params.id, req.body, {new: true})
@@ -140,12 +116,6 @@ class CategoriesController {
     }
 
     // [DELETE] /categories/:id
-    // deleteCategory(req, res, next) {
-    //     Category.deleteOne({ _id: req.params.id})
-    //         .then(category => res.json(category))
-    //         .catch(next)
-    // }
-
     async deleteCategory(req, res, next){
         try {
             const category = await Category.findByIdAndDelete(req.params.id)

@@ -4,7 +4,7 @@ const Shop = require('../models/Shops.model')
 const User = require('../models/Users.model')
 const responseFormat = require('../../util/responseFormat.js')
 const {StatusCodes} = require('http-status-codes')
-const pageSize = 2
+// const pageSize = 2
 
 class ProductsController {
 
@@ -84,47 +84,31 @@ class ProductsController {
 
     async getProducts(req, res, next){
         try {
-            const page = req.query.page
-            
-            if (page) {
-                const {
-                    // page = 1, 
-                    limit = 2, 
-                    sort = "createdAt", 
-                    order = "asc"
-                } = req.query
-                console.log('da vao day')
-                const options = {
-                    page,
-                    limit,
-                    sort: {
-                        [sort] : order === "asc" ? 1 : -1
-                    },
-                    populate: ['category', 'shop', 'user']
-                }
-    
-                const data = await Product.paginate({}, options)
-                console.log(data)
-                if (!data.docs || data.docs.length === 0 ) {
-                    return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-                        message: `Khong tim thay data`,
-                    }))
-                }
-                return res.status(StatusCodes.OK).json(responseFormat(true, { 
-                    message: `Tim thay data`
-                },data))
-            } else {
-                const data = await Product.find({})
-                if (!data.docs || data.docs.length === 0 ) {
-                    return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-                        message: `Khong tim thay data`,
-                    }))
-                }
-                return res.status(StatusCodes.OK).json(responseFormat(true, { 
-                    message: `Tim thay data`
-                },data))
+            const {
+                page = 1,
+                limit = 7,
+                sort = "createdAt",
+                order = "asc"
+            } = req.query
+
+            const options = {
+                page,
+                limit,
+                sort: {
+                    [sort] : order === "asc" ? 1 : -1
+                },
+                populate: ['category', 'shop', 'user']
             }
-            
+
+            const data = await Product.paginate({}, options)
+            if (!data.docs || data.docs.length === 0 ) {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                    message: `Khong tim thay data`,
+                }))
+            }
+            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+                message: `Tim thay data`
+            },data))
         } catch (error) {
             console.log(error) 
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 

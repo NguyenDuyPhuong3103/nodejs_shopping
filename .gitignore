@@ -1,10 +1,16 @@
 .vscode/
 
+data/
+
 node_modules/
 
 package-lock.json
 
 shopping_backend/.vscode/
+
+shopping_backend/src/app/controllers/InsertControllers.js
+
+shopping_backend/src/routers/insert.route.js
 
 shopping_backend/node_modules/
 

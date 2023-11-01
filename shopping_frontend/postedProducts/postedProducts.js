@@ -39,23 +39,7 @@ getAllProducts()
     .catch(function(error){
         alert('There was a mistake!!!')
     })
-
-//Delete product
-
-var productId
-
-$('#deleteProductModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget)
-    productId = button.data('id')
-})
-
-var btnDeleteProduct = $('#btn-delete-product')
-
-btnDeleteProduct.on( "click", function( event ) {
-    deleteProduct(productId)
-})
-
-
+    
 //Delete product
         
 var productId

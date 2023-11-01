@@ -1,9 +1,10 @@
 const joi = require('joi')
 const responseFormat = require('../../util/responseFormat.js')
-const {StatusCodes} = require('http-status-codes')
+const { StatusCodes } = require('http-status-codes')
+const cloudinary = require('cloudinary').v2
 
 const schemas = {
-    userSchema : joi.object({
+    userSchema: joi.object({
         email: joi.string()
             .email()
             .lowercase()
@@ -16,77 +17,78 @@ const schemas = {
             .min(2)
             .max(40)
             .lowercase(),
-        avatar: joi.string()
-            .lowercase(),
-        sex: joi.string()
-            .min(2)
-            .max(3),
-        phone: joi.string()
-            .min(10)
-            .max(13),
-        birth_year : joi.date()
-            .min(1940)
-            .max(2008),
-        address: joi.string()
-            .min(4)
-            .max(70),
-        // shops: Joi.array()
-        //     .items(Joi.string()),
-        // products: Joi.array()
-        //     .items(Joi.string()),
+        sex: joi.string(),
+        phone: joi.string(),
+        birth_year: joi.date(),
+        address: joi.string(),
+        avatar: joi.string(),
+        // shops: joi.array()
+        //     .items(joi.string()),
+        // products: joi.array()
+        //     .items(joi.string()),
     }),
 
-    productSchema : joi.object({
-        name: joi.string()
+    productSchema: joi.object({
+        title: joi.string()
             .required(),
-        image: joi.string(),
+        price: joi.number()
+            .required(),
+        color: joi.string(),
+        sizes: joi.array()
+            .items(joi.string()),
+        images: joi.array()
+            .items(joi.string()),
         description: joi.string(),
-        classification: joi.string(),
-        price: joi.string()
-            .required(),
-        // user: Joi.string()
+        // user: joi.string()
+        //     .alphanum()
         //     .required(),
-        // shop: Joi.string()
+        // shop: joi.string()
+        //     .alphanum()
         //     .required(),
-        // category: Joi.string(),
+        // category: joi.string()
+        //     .alphanum()
+        //     .required(),
     }),
 
-    categorySchema : joi.object({
+    categorySchema: joi.object({
         name: joi.string()
             .required(),
         image: joi.string()
             .required(),
         description: joi.string(),
-        // shop: Joi.string()
+        // shop: joi.string()
         //     .required(),
-        // products: Joi.array()
-        //     .items(Joi.string()),
+        // products: joi.array()
+        //     .items(joi.string()),
     }),
 
-    shopSchema : joi.object({
+    shopSchema: joi.object({
         name: joi.string()
             .required(),
-        image: joi.string(),
+        avatar: joi.string(),
         description: joi.string(),
         classification: joi.string(),
-        // user: Joi.string()
+        // user: joi.string()
         //     .required(),
-        // categories: Joi.array()
-        //     .items(Joi.string()),
-        // products: Joi.array()
-        //     .items(Joi.string()),
+        // categories: joi.array()
+        //     .items(joi.string()),
+        // products: joi.array()
+        //     .items(joi.string()),
     }),
 }
 
 function validate(schema) {
     return async (req, res, next) => {
-      try {
-        await schema.validateAsync(req.body, { allowUnknown: true })
-        next()
-      } catch (error) {
-        res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { message: error.message, data: 'sai o day' }))
-      }
+        try {
+            await schema.validateAsync({ ...req.body, avatar: req.file?.path }, { allowUnknown: true })
+            next()
+        } catch (error) {
+            if (req.file) {
+                cloudinary.uploader.destroy(req.file.filename)
+                return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { message: 'sai o day' }, error))
+            }
+        }
     }
 }
-  
+
 module.exports = { validate, schemas }

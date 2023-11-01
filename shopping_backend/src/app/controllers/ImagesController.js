@@ -1,10 +1,9 @@
 // //import collection (Course) in mongoDB compass => Course export model (Schema)
-const cloudinary = require('../../config/cloudinary/cloudinary')
-const {StatusCodes} = require('http-status-codes')
-const responseFormat = require('../../util/responseFormat.js')
+const cloudinary = require("../../config/cloudinary/cloudinary");
+const { StatusCodes } = require("http-status-codes");
+const responseFormat = require("../../util/responseFormat.js");
 
 class ImgsController {
-
     //[POST] /
     async uploadImages(req, res, next) {
         // try {
@@ -21,40 +20,51 @@ class ImgsController {
         //         })
         //     }
         //     // console.log(images)
-        //     return res.status(StatusCodes.OK).json(responseFormat(true, { 
+        //     return res.status(StatusCodes.OK).json(responseFormat(true, {
         //         message: `upload image successfully!!!`
         //     },uploadedImages))
         // } catch (error) {
-        //     return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { 
+        //     return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, {
         //         message: `Co loi o server uploadedImages`,
         //     }))
         // }
 
-        const link_img = req.files['image'][0]
-        return res.status(StatusCodes.OK).json(responseFormat(true, { 
-            message: `upload image successfully!!!`
-        },link_img))
+        const link_img = req.files["image"][0];
+        return res.status(StatusCodes.OK).json(
+            responseFormat(
+                true,
+                {
+                    message: `upload image successfully!!!`,
+                },
+                link_img
+            )
+        );
     }
 
     //[DELETE] /
     async removeImages(req, res, next) {
         try {
-            const publicId = req.params.publicId
-            const results = await cloudinary.uploader.destroy(publicId)
-            if(results.result === "not found") {
-                throw new Error("Delete images failed!!!")
-            }
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
-                message: `remove image successfully!!!`
-            }))
+            const publicId = req.params.publicId;
+            const urlArray = publicId.split('/');
+            const image = `${urlArray[urlArray.length - 3]}/${urlArray[urlArray.length - 2]}/${urlArray[urlArray.length - 1]}`
+            const imageName = image.split('.')[0]
+
+            cloudinary.api.delete_resources([imageName], (error, result) => {
+                if (error) {
+                    console.error('Lỗi khi xóa ảnh:', error);
+                } else {
+                    console.log('Xóa ảnh thành công:', result);
+                }
+            });
         } catch (error) {
-            return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { 
-                message: `Co loi o server removeImages`,
-                error: error
-            }))
+            return res.status(StatusCodes.BAD_REQUEST).json(
+                responseFormat(false, {
+                    message: `Co loi o server removeImages`,
+                    error: error,
+                })
+            );
         }
     }
-
 }
 
-module.exports = new ImgsController
+module.exports = new ImgsController();

@@ -4,9 +4,9 @@ const Schema = mongoose.Schema
 
 // Create Products model
 const products = new Schema({
-    title: {type: String, required: true },
-    price: {type: String, default: '0' },
-    color: {type: String, default: 'undefined' },
+    title: {type: String, required: true, unique: true},
+    price: {type: String, default: '0'},
+    color: {type: String, default: 'undefined'},
     sizes: [{type: String, default: [] }],
     images: [{type: String, default: [] }],
     description: [{type: String, default: [] }],

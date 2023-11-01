@@ -1,0 +1,24 @@
+.classHandleImages{
+    width: 100%;
+    height: 100%;
+}
+
+.imagesPreview > div{
+    position: relative;
+    width: 25%;
+    height: 25%;
+}
+
+.imagesPreview > div > span{
+    position: absolute;
+    padding: 0;
+    top: 8px;
+    right: 8px;
+    background-color: rgba(112, 113, 114, 0.577);
+    border-radius: 50%;
+}
+
+.imagesPreview > div > span:hover {
+    background-color: rgba(68, 69, 70, 0.577);
+    cursor: pointer;
+}

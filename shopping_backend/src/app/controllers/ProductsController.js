@@ -3,7 +3,7 @@ const Category = require('../models/Categories.model')
 const Shop = require('../models/Shops.model')
 const User = require('../models/Users.model')
 const responseFormat = require('../../util/responseFormat.js')
-const {StatusCodes} = require('http-status-codes')
+const { StatusCodes } = require('http-status-codes')
 // const pageSize = 2
 
 class ProductsController {
@@ -19,7 +19,7 @@ class ProductsController {
     //             if (page < 1) {
     //                 page = 1 
     //             }
-                
+
     //             const startPage = Math.max((page - 1) * pageSize, 0)
 
     //             const products = await Product.find({})
@@ -82,7 +82,7 @@ class ProductsController {
     //     }
     // }
 
-    async getProducts(req, res, next){
+    async getProducts(req, res, next) {
         try {
             const {
                 page = 1,
@@ -95,103 +95,103 @@ class ProductsController {
                 page,
                 limit,
                 sort: {
-                    [sort] : order === "asc" ? 1 : -1
+                    [sort]: order === "asc" ? 1 : -1
                 },
                 populate: ['category', 'shop', 'user']
             }
 
             const data = await Product.paginate({}, options)
-            if (!data.docs || data.docs.length === 0 ) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+            if (!data.docs || data.docs.length === 0) {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong tim thay data`,
                 }))
             }
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Tim thay data`
-            },data))
+            }, data))
         } catch (error) {
-            console.log(error) 
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            console.log(error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server getAllProducts`,
             }))
         }
     }
 
     //[GET] /products/:id
-    async getProductById(req, res, next){
+    async getProductById(req, res, next) {
         try {
             const product = await Product.findById(req.params.id)
                 .populate('category')
                 .populate('shop')
                 .populate('user')
             if (!product) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong tim thay product`,
                 }))
             }
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Tim thay product`
-            },product))
+            }, product))
         } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server getProductById`,
-                error: error, 
+                error: error,
             }))
         }
     }
 
     // [POST] /products
-    async createProduct(req, res, next){
+    async createProduct(req, res, next) {
         try {
             const product = await Product.create(req.body)
             if (!product) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong tao duoc product`,
                 }))
             }
 
-            const updateCategory = await Category.findByIdAndUpdate(product.category, {
-                $addToSet:{
-                    products: product._id
-                }
-            })
+            // const updateCategory = await Category.findByIdAndUpdate(product.category, {
+            //     $addToSet:{
+            //         products: product._id
+            //     }
+            // })
 
-            if (!updateCategory) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-                    message: `Khong cap nhat duoc category`,
-                }))
-            }
+            // if (!updateCategory) {
+            //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+            //         message: `Khong cap nhat duoc category`,
+            //     }))
+            // }
 
-            const updateShop = await Shop.findByIdAndUpdate(product.shop, {
-                $addToSet:{
-                    products: product._id
-                }
-            })
+            // const updateShop = await Shop.findByIdAndUpdate(product.shop, {
+            //     $addToSet:{
+            //         products: product._id
+            //     }
+            // })
 
-            if (!updateShop) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-                    message: `Khong cap nhat duoc shop`,
-                }))
-            }
+            // if (!updateShop) {
+            //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+            //         message: `Khong cap nhat duoc shop`,
+            //     }))
+            // }
 
-            const updateUser = await User.findByIdAndUpdate(product.user, {
-                $addToSet:{
-                    products: product._id
-                }
-            })
+            // const updateUser = await User.findByIdAndUpdate(product.user, {
+            //     $addToSet:{
+            //         products: product._id
+            //     }
+            // })
 
-            if (!updateUser) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-                    message: `Khong cap nhat duoc user`,
-                }))
-            }
+            // if (!updateUser) {
+            //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+            //         message: `Khong cap nhat duoc user`,
+            //     }))
+            // }
 
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Tao thanh cong product`
-            },product))
+            }, product))
         } catch (error) {
             console.log(error)
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server createProduct`,
                 error: error,
             }))
@@ -199,77 +199,77 @@ class ProductsController {
     }
 
     // [PUT] /products
-    async updateProductById(req, res, next){
+    async updateProductById(req, res, next) {
         try {
-            const product = await Product.findByIdAndUpdate(req.params.id, req.body, {new: true})
+            const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true })
             if (!product) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong cap nhat duoc product`,
                 }))
             }
 
             const updateCategory = await Category.findByIdAndUpdate(product.category, {
-                $addToSet:{
+                $addToSet: {
                     products: product._id
                 }
             })
 
             if (!updateCategory) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong cap nhat duoc category`,
                 }))
             }
 
             const updateShop = await Shop.findByIdAndUpdate(product.shop, {
-                $addToSet:{
+                $addToSet: {
                     products: product._id
                 }
             })
 
             if (!updateShop) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong cap nhat duoc shop`,
                 }))
             }
 
             const updateUser = await User.findByIdAndUpdate(product.user, {
-                $addToSet:{
+                $addToSet: {
                     products: product._id
                 }
             })
 
             if (!updateUser) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong cap nhat duoc user`,
                 }))
             }
 
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Cap nhat thanh cong product`
-            },product))
+            }, product))
 
         } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server editProductById`,
-                error: error, 
+                error: error,
             }))
         }
     }
 
     // [DELETE] /products/:id
-    async deleteProduct(req, res, next){
+    async deleteProduct(req, res, next) {
         try {
             const product = await Product.findByIdAndDelete(req.params.id)
             if (!product) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong xoa duoc product`,
                 }))
             }
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Xoa thanh cong product`
-            },product))
+            }, product))
         } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server deleteProduct`,
             }))
         }

@@ -3,6 +3,7 @@ const RefreshTokenModel = require('../models/RefreshTokens.model')
 const responseFormat = require('../../util/responseFormat.js')
 const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../middleware/jwtService')
 const {StatusCodes} = require('http-status-codes')
+const cloudinary = require('cloudinary').v2
 
 class UserController {
 
@@ -17,12 +18,14 @@ class UserController {
                     message: `${email} da ton tai, vui long nhap email khac!!!` 
                 }))
             }
-
+            req.body.avatar = req.file?.path
+            
             const user = new User(req.body)
 
             const saveUser = await user.save()
 
             if (!saveUser) {
+                cloudinary.uploader.destroy(req.file.filename)
                 return res.status(StatusCodes.OK).json(responseFormat(false, { 
                     message: 'Lỗi khi tạo người dùng!!!' 
                 }))
@@ -32,10 +35,14 @@ class UserController {
                 message: 'Ban da dang ky thanh cong!!!'
             }, saveUser))
         } catch (error) {
-            return res.status(StatusCodes.OK).json(responseFormat(false, { 
-                message: `Co loi o server register`,
-                error: error, 
-            }))
+            if(req.file) {
+                cloudinary.uploader.destroy(req.file.filename)
+                console.log(error)
+                return res.status(StatusCodes.OK).json(responseFormat(false, { 
+                    message: `Co loi o server register`,
+                    error: error, 
+                }))
+            }
         }
     }
 

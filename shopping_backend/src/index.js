@@ -60,25 +60,6 @@ app.use(
 //Routes init
 app.use('/api', baseRouter);
 
-//test
-// const cloudinary = require('cloudinary').v2;
-
-// cloudinary.config({
-//     cloud_name: process.env.CLOUDINARY_NAME,
-//     api_key: process.env.CLOUDINARY_KEY,
-//     api_secret: process.env.CLOUDINARY_SECRET
-// })
-
-// const publicId = 'shopping-nodejs/image-products/yclu6drjolff77k1qjvs';
-
-// cloudinary.uploader.callApi(deleteUrl, 'DELETE', {}, (error, result) => {
-//     if (error) {
-//         console.error('Lỗi khi xóa ảnh:', error);
-//     } else {
-//         console.log('Xóa ảnh thành công:', result);
-//     }
-// });
-
 app.listen(PORT, () => {
     console.log(`App listening at http://localhost:${PORT}`);
 });

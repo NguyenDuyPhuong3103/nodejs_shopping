@@ -2,7 +2,6 @@
 const cloudinary = require("../../config/cloudinary/cloudinary");
 const { StatusCodes } = require("http-status-codes");
 const responseFormat = require("../../util/responseFormat.js");
-
 class ImgsController {
     //[POST] /
     async uploadImages(req, res, next) {
@@ -42,27 +41,45 @@ class ImgsController {
     }
 
     //[DELETE] /
+    // async removeImages(req, res, next) {
+    //     try {
+    //         const publicId = req.params.publicId;
+    //         const urlArray = publicId.split('/');
+    //         const image = `${urlArray[urlArray.length - 3]}/${urlArray[urlArray.length - 2]}/${urlArray[urlArray.length - 1]}`
+    //         const imageName = image.split('.')[0]
+
+    //         cloudinary.api.delete_resources([imageName], (error, result) => {
+    //             if (error) {
+    //                 console.error('Lỗi khi xóa ảnh:', error);
+    //             } else {
+    //                 console.log('Xóa ảnh thành công:', result);
+    //             }
+    //         });
+    //     } catch (error) {
+    //         return res.status(StatusCodes.BAD_REQUEST).json(
+    //             responseFormat(false, {
+    //                 message: `Co loi o server removeImages`,
+    //                 error: error,
+    //             })
+    //         );
+    //     }
+    // }
+
     async removeImages(req, res, next) {
         try {
-            const publicId = req.params.publicId;
-            const urlArray = publicId.split('/');
-            const image = `${urlArray[urlArray.length - 3]}/${urlArray[urlArray.length - 2]}/${urlArray[urlArray.length - 1]}`
-            const imageName = image.split('.')[0]
+            const cloudinaryAvatar = req.query.fileName
+            if (cloudinaryAvatar) {
+                await cloudinary.uploader.destroy(cloudinaryAvatar)
 
-            cloudinary.api.delete_resources([imageName], (error, result) => {
-                if (error) {
-                    console.error('Lỗi khi xóa ảnh:', error);
-                } else {
-                    console.log('Xóa ảnh thành công:', result);
-                }
-            });
+                return res.status(StatusCodes.OK).json(responseFormat(true, {
+                    message: `delete image successfully!!!`,
+                }));
+            }
         } catch (error) {
-            return res.status(StatusCodes.BAD_REQUEST).json(
-                responseFormat(false, {
-                    message: `Co loi o server removeImages`,
-                    error: error,
-                })
-            );
+            return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, {
+                message: `Co loi o server removeImages`,
+                error: error,
+            }));
         }
     }
 }

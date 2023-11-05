@@ -33,6 +33,10 @@ async function createImages(images) {
     }))
 }
 
+async function deleteImages(fileName) {
+    return (await instance.delete(`images?fileName=${fileName}`))
+}
+
 async function updateProduct(productId, newProduct) {
     return (await instance.put(`products/${productId}`, newProduct)).data
 }
@@ -42,7 +46,6 @@ async function detailProduct() {
 }
 
 async function createProduct(newProduct) {
-    // return (await instance.post('products', newProduct)).data
     return (await axios({
         method: 'post',
         url: 'http://localhost:3000/api/products',
@@ -66,9 +69,12 @@ function getStringValue(input) {
     return data
 }
 
-// function getPriceValue(input) {
-//     const 
-// }
+function getFileName(url) {
+    const urlArray = url.split('/');
+    const urlCut = `${urlArray[urlArray.length - 3]}/${urlArray[urlArray.length - 2]}/${urlArray[urlArray.length - 1]}`
+    const fileName = urlCut.split('.')[0]
+    return fileName
+}
 
 // Sử dụng jQuery để thêm sự kiện change
 async function handleInputImages(event) {
@@ -119,13 +125,17 @@ async function handleInputImages(event) {
 
     // Xóa ảnh khi chưa submit
     $('span[title="xoa"]').on('click', async function () {
-        const divToRemove = $(this).closest('div');
+        const divToRemove = $(this).closest('div')
         if (divToRemove.length) {
-            const imgToRemove = divToRemove.find('img').attr('src');
+            const imgToRemove = divToRemove.find('img').attr('src')
+            const fileNameToDelete = getFileName(imgToRemove)
+            console.log(fileNameToDelete)
+            deleteImages(fileNameToDelete)
+
             imagesArrayData = imagesArrayData.filter(item => item !== imgToRemove)
-            divToRemove.remove();
+            divToRemove.remove()
         }
-    });
+    })
 }
 
 if (window.location.href == createURL) {
@@ -137,8 +147,8 @@ if (window.location.href == createURL) {
 
                 <form id="editProduct" enctype="multipart/form-data">
                     <div class="form-group">
-                        <label for="name">Name item</label>
-                        <input type="text" class="form-control" value="${product.name}" id="name" name="name">
+                        <label for="title">Title item</label>
+                        <input type="text" class="form-control" value="${product.title}" id="title" title="title">
                     </div>
 
                     <div class="form-group">

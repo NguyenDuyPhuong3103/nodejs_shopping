@@ -1,8 +1,9 @@
 const User = require('../models/Users.model')
 const Shop = require('../models/Shops.model')
-const responseFormat = require('../../util/responseFormat.js')
+const responseFormat = require('../../util/responseFormat')
 const { StatusCodes } = require('http-status-codes')
 const cloudinary = require('../../config/cloudinary/cloudinary')
+const getFileName = require('../middleware/getFileName')
 
 class ShopsController {
 
@@ -99,8 +100,14 @@ class ShopsController {
 
             if (req.file) req.body.avatar = req.file?.path
 
-            const shop = await Shop.findByIdAndUpdate(req.params.id, req.body, { new: true })
-            if (!shop) {
+            const shop = await Shop.findById(req.params.id)
+            if (shop) {
+                const oldAvatar = getFileName(shop.avatar)
+                cloudinary.uploader.destroy(oldAvatar)
+            }
+
+            const updatedShop = await Shop.findByIdAndUpdate(req.params.id, req.body, { new: true })
+            if (!updatedShop) {
                 cloudinary.uploader.destroy(req.file.filename)
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong cap nhat duoc shop`,
@@ -121,7 +128,7 @@ class ShopsController {
 
             return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Cap nhat thanh cong shop`
-            }, shop))
+            }, updatedShop))
         } catch (error) {
             if (req.file) {
                 cloudinary.uploader.destroy(req.file.filename)
@@ -137,15 +144,21 @@ class ShopsController {
     // [DELETE] /shops/:id
     async deleteShop(req, res, next) {
         try {
-            const shop = await Shop.findByIdAndDelete(req.params.id)
-            if (!shop) {
+            const shop = await Shop.findById(req.params.id)
+            if (shop) {
+                const cloudinaryAvatar = getFileName(shop.avatar)
+                cloudinary.uploader.destroy(cloudinaryAvatar)
+            }
+
+            const deletedShop = await Shop.findByIdAndDelete(req.params.id)
+            if (!deletedShop) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong xoa duoc shop`,
                 }))
             }
             return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Xoa thanh cong shop`
-            }, shop))
+            }, deletedShop))
         } catch (error) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server deleteShop`,

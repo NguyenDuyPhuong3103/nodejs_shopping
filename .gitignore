@@ -10,6 +10,8 @@ shopping_backend/.vscode/
 
 shopping_backend/src/app/controllers/InsertController.js
 
+shopping_backend/src/pre-start/env/development.env
+
 shopping_backend/src/router/insert.route.js
 
 shopping_backend/node_modules/

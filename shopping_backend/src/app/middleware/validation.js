@@ -85,7 +85,7 @@ function validate(schema) {
         } catch (error) {
             if (req.file) {
                 cloudinary.uploader.destroy(req.file.filename)
-                return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { message: 'sai o day' }, error))
+                return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { message: 'Nội dung không hợp lệ !!!' }, error))
             }
         }
     }

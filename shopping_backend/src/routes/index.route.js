@@ -8,7 +8,6 @@ const siteRouter = require('./site.route')
 const insertRouter = require('./insert.route')
 const imagesRouter = require('./images.route')
 
-
 baseRouter.use('/products', productsRouter)
 baseRouter.use('/categories', categoriesRouter)
 baseRouter.use('/shops', shopsRouter)

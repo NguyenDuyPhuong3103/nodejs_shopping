@@ -3,6 +3,8 @@ const router = express.Router()
 
 const { validate, schemas } = require('../app/middleware/validation')
 
+const { notFound, errHandler } = require('../app/middleware/errorHandler')
+
 const { verifyAccessToken } = require('../app/middleware/jwtService')
 
 const { uploadShopToCloud } = require('../app/middleware/uploadImages')
@@ -16,5 +18,7 @@ router.put('/:id', uploadShopToCloud.single('avatar'), validate(schemas.shopSche
 router.delete('/:id', shopsController.deleteShop)
 router.get('/:id', shopsController.getShopById)
 router.get('/', shopsController.getAllShops)
+router.use(notFound)
+router.use(errHandler)
 
 module.exports = router

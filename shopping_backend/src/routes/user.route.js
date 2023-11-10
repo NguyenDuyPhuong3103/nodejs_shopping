@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 
+const { notFound, errHandler } = require('../app/middleware/errorHandler')
+
 const { validate, schemas } = require('../app/middleware/validation')
 
 const { verifyAccessToken } = require('../app/middleware/jwtService')
@@ -18,5 +20,7 @@ router.get('/refresh-token', userController.refreshToken)
 router.post('/logout', verifyAccessToken, userController.logout)
 router.delete('/:id', userController.deleteUser)
 router.get('/', verifyAccessToken, userController.getInfoUsers)
+router.use(notFound)
+router.use(errHandler)
 
 module.exports = router

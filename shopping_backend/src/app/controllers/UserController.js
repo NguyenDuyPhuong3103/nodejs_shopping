@@ -33,7 +33,7 @@ class UserController {
             }
 
             return res.status(StatusCodes.CREATED).json(responseFormat(true, {
-                message: 'Ban da dang ky thanh cong!!!'
+                message: 'Ban da dang ky thanh cong. Vui long dang nhap tai khoan !!!'
             }, saveUser))
         } catch (error) {
             if (req.file) {

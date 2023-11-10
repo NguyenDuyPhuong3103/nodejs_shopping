@@ -7,11 +7,19 @@ const users = new Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     name: { type: String, required: true },
-    sex: String,
-    phone: String,
-    birth: Date,
+    sex: { type: String },
+    phone: { type: String },
+    birth: { type: Date },
     address: { type: String, default: 'undefined' },
-    avatar: String,
+    avatar: { type: String },
+    cart: { type: Array, default: [] }, //giỏ hàng
+    role: { type: String, default: 'user' }, // phân quyền
+    wishlist: [{ type: Schema.Types.ObjectId, ref: 'products' }], //lưu những sản phẩm yêu thích
+    isBlocked: { type: Boolean, default: false }, // tài khoản bị khóa hay không
+    refreshToken: { type: String },
+    passwordChangeAt: { type: String }, // truong hop quen password
+    passwordResetToken: { type: String }, // gui password qua email de xac nhan
+    passwordResetExpires: { type: String }, // thời gian hết hạn
     shops: [{ type: Schema.Types.ObjectId, ref: 'shops' }],
     products: [{ type: Schema.Types.ObjectId, ref: 'products' }],
 }, {
@@ -20,6 +28,9 @@ const users = new Schema({
 
 users.pre('save', async function (next) {
     try {
+        if (!this.isModified('password')) {
+            next()
+        }
         const salt = await bcrypt.genSalt(10)
         const hashPassword = await bcrypt.hash(this.password, salt)
         this.password = hashPassword

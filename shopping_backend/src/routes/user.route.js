@@ -17,9 +17,10 @@ router.post('/register', uploadUserToCloud.single('avatar'), validate(schemas.us
 router.put('/:id', uploadUserToCloud.single('avatar'), validate(schemas.userSchema), userController.updateUser)
 router.post('/login', validate(schemas.userSchema), userController.login)
 router.get('/refresh-token', userController.refreshToken)
-router.post('/logout', verifyAccessToken, userController.logout)
+router.get('/logout', verifyAccessToken, userController.logout)
 router.delete('/:id', userController.deleteUser)
-router.get('/', verifyAccessToken, userController.getInfoUsers)
+router.get('/getInfoUser', verifyAccessToken, userController.getInfoUser)
+router.get('/reset', verifyAccessToken, userController.resetPassword)
 router.use(notFound)
 router.use(errHandler)
 

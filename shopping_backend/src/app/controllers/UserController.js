@@ -83,17 +83,20 @@ class UserController {
     }
 
     //[POST] /login
+    // Đăng nhập vào tài khoản đã đăng ký
+    // Tạo AccessToken và RefreshToken
+    // AccessToken: 
     async login(req, res, next) {
         try {
             const { email, password } = req.body
 
             const user = await User.findOne({ email })
+                .populate("shops")
                 .populate("products")
-                .populate("user")
 
             if (!user) {
                 return res.status(StatusCodes.OK).json(responseFormat(false, {
-                    message: `email hoac password sai, vui long nhap lai!!!`
+                    message: `Email khong ton tai, vui long nhap lai!!!`
                 }))
             }
 
@@ -101,31 +104,21 @@ class UserController {
 
             if (!isValid) {
                 return res.status(StatusCodes.OK).json(responseFormat(false, {
-                    message: `email hoac password sai, vui long nhap lai!!!`
+                    message: `Password sai, vui long nhap lai!!!`
                 }))
             }
 
-            const accessToken = await signAccessToken(user._id)
+            const accessToken = await signAccessToken(user._id, user.role)
             const refreshToken = await signRefreshToken(user._id)
 
-            const tokenInSchema = await RefreshTokenModel.findOne({ user: user._id })
-            if (!tokenInSchema) {
-                const refreshTokenModel = new RefreshTokenModel({
-                    token: refreshToken,
-                    user: user._id,
-                })
-                await refreshTokenModel.save()
-            } else {
-                let newRefreshToken = await RefreshTokenModel.findOneAndUpdate(
-                    { user: user._id },
-                    { token: refreshToken },
-                    { new: true }
-                )
-            }
+            //Lưu refreshToken vào database
+            await User.findByIdAndUpdate(user._id, { refreshToken }, { new: true })
 
-            await res.cookie("refreshToken", refreshToken, { maxAge: 1000 * 60 * 10, httpOnly: false })
+            //Lưu refreshToken vào cookie ( thời gian hết hạn : 7 ngày)
+            await res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 6 * 30 * 24 * 60 * 60 * 1000 })
 
             user.password = undefined
+            user.role = undefined
 
             return res.status(StatusCodes.ACCEPTED).json(responseFormat(true, {
                 message: 'Ban da dang nhap thanh cong!!!'
@@ -134,8 +127,27 @@ class UserController {
                 accessToken
             }))
         } catch (error) {
+            console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server login`,
+                error: error,
+            }))
+        }
+    }
+
+    //[GET] /
+    // chưa dùng đến
+    async getInfoUser(req, res, next) {
+        try {
+            const { _id } = await req.user
+            const infoUser = await User.findById(_id).select('-refreshToken -password -role')
+            return res.status(StatusCodes.OK).json(responseFormat(true,
+                { message: `200 OK` },
+                { infoUser }))
+        } catch (error) {
+            console.log(error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
+                message: `Co loi o server getInfoUser`,
                 error: error,
             }))
         }
@@ -148,38 +160,38 @@ class UserController {
     */
     async refreshToken(req, res, next) {
         try {
-            const refreshToken = req.cookies.refreshToken
-            if (!refreshToken) {
+            //Lấy token từ cookie
+            const cookie = req.cookies
+            if (!cookie && !cookie.refreshToken) {
                 return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, {
                     message: `Khong tim thay refreshToken trong cookie o server!!`
                 }))
             }
 
-            const { userId } = await verifyRefreshToken(refreshToken)
+            //Check token có hợp lệ hay ko? Nếu có thì lấy dữ liệu đã được verify ra
+            //dataVerify chính là _id
+            const dataVerify = await verifyRefreshToken(cookie.refreshToken)
 
-            const findToken = await RefreshTokenModel.findOne({ token: refreshToken })
-            if (!findToken) {
+            //Check xem token có khớp với token đã lưu trong db
+            const user = await User.findOne({ _id: dataVerify._id, refreshToken: cookie.refreshToken })
+
+            if (!user) {
                 return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, {
-                    message: `refreshToken khong hop le!!`
+                    message: `Không tìm thấy user hợp lệ !!!`
                 }))
             } else {
-                const accessToken = await signAccessToken(userId)
-                const newRef = await signRefreshToken(userId)
-                let newRefreshToken = await RefreshTokenModel.findOneAndUpdate(
-                    { token: refreshToken },
-                    { token: newRef },
-                    { new: true }
-                )
+                const newAccessToken = await signAccessToken(user._id, user.role)
+                const newRefreshToken = await signRefreshToken(user._id)
+                await User.findOneAndUpdate({ token: req.cookies }, { token: newRefreshToken }, { new: true })
 
-                res.cookie("refreshToken", newRef, { maxAge: 1000 * 60 * 10, httpOnly: false })
+                await res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: 6 * 30 * 24 * 60 * 60 * 1000 })
 
                 return res.status(StatusCodes.OK).json(responseFormat(true, {
                     message: `Refresh Token thanh cong!!!`
-                }, {
-                    accessToken
-                }))
+                }, { newAccessToken }))
             }
         } catch (error) {
+            console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server refreshToken`,
                 error: error,
@@ -189,11 +201,55 @@ class UserController {
 
     //[DELETE] /logout
     async logout(req, res, next) {
-        await res.clearCookie("refreshToken")
 
         try {
-            const deletedUser = await RefreshTokenModel.findOneAndDelete({ token: req.cookies.refreshToken })
+            //Tìm và xóa refresh token ở db
+            const deletedUser = await User.findOneAndUpdate({ refreshToken: req.cookies.refreshToken }, { refreshToken: '' }, { new: true })
             if (deletedUser) {
+                //Xóa refresh token ở cookie trình duyệt
+                await res.clearCookie('refreshToken', {
+                    httpOnly: true,
+                    secure: true
+                })
+
+                return res.status(StatusCodes.OK).json(responseFormat(true, {
+                    message: 'Ban da dang xuat thanh cong!!!'
+                }))
+            } else {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+                    message: `Co loi o server logout, khong tim thay refreshToken`,
+                }))
+            }
+        } catch (error) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
+                message: `Co loi o server Log out`,
+                error: error,
+            }))
+        }
+    }
+
+    //[DELETE] /reset
+    // 1./ Client gửi mail
+    // 2./ Server check xem mail có hợp lệ hay không => gửi mail + kèm theo link (password change token)
+    // 3./ Client check mail => click link
+    // 4./ Client gửi api kèm token
+    // 5./ Check token có giống với token mà server gửi mail hay không
+    // 6./ Change password
+
+    async resetPassword(req, res, next) {
+        const { email } = req.query
+
+
+        try {
+            //Tìm và xóa refresh token ở db
+            const deletedUser = await User.findOneAndUpdate({ refreshToken: req.cookies.refreshToken }, { refreshToken: '' }, { new: true })
+            if (deletedUser) {
+                //Xóa refresh token ở cookie trình duyệt
+                await res.clearCookie('refreshToken', {
+                    httpOnly: true,
+                    secure: true
+                })
+
                 return res.status(StatusCodes.OK).json(responseFormat(true, {
                     message: 'Ban da dang xuat thanh cong!!!'
                 }))
@@ -234,24 +290,6 @@ class UserController {
             console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server deleteUser`,
-                error: error,
-            }))
-        }
-    }
-
-    //[GET] /
-    // chưa dùng đến
-    async getInfoUsers(req, res, next) {
-        try {
-            const user_id = await req.payload.userId
-            const infoUser = await User.findOne({ _id: user_id })
-            infoUser.password = undefined
-            return res.status(StatusCodes.OK).json(responseFormat(true,
-                { message: `200 OK` },
-                { infoUser }))
-        } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
-                message: `Co loi o server getInfoUsers`,
                 error: error,
             }))
         }

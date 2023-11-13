@@ -2,10 +2,12 @@ const jwt = require('jsonwebtoken')
 const { StatusCodes } = require('http-status-codes')
 const responseFormat = require('../../util/responseFormat.js')
 
-const signAccessToken = async (userId) => {
+//signAccessToken === generateAccessToken
+const signAccessToken = async (userId, role) => {
     return new Promise((resolve, reject) => {
         const payload = {
-            userId,
+            _id: userId,
+            role
         }
         const secret = process.env.ACCESS_TOKEN_SECRET
         const options = {
@@ -22,7 +24,7 @@ const signAccessToken = async (userId) => {
 const signRefreshToken = async (userId) => {
     return new Promise((resolve, reject) => {
         const payload = {
-            userId
+            _id: userId
         }
         const secret = process.env.REFRESH_TOKEN_SECRET
         const options = {
@@ -39,21 +41,21 @@ const signRefreshToken = async (userId) => {
 const verifyAccessToken = async (req, res, next) => {
     if (!req.headers['authorization']) {
         return next(res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
-            message: `Khong co authorization o phan header duoc gui len tu client!!!`
+            message: `Khong co authorization o phan header duoc gui len tu client!!! (Bạn chưa đặng nhập. Vui lòng đăng nhập và thử lại!!!)`
         })).end())
     }
     const authHeader = req.headers['authorization']
     const bearerToken = authHeader.split(' ')
     const token = bearerToken[1]
-    //verify access token
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decode) => {
         if (err) {
-            return res.status(StatusCodes.OK).json(responseFormat(false, {
+            return res.status(StatusCodes.UNAUTHORIZED).json(responseFormat(false, {
                 message: `co loi o phan verifyAccessToken, token khong hop le!!!`,
                 err: err,
             })).end()
         }
-        req.payload = payload
+        req.user = decode
         next()
     })
 }
@@ -61,13 +63,9 @@ const verifyAccessToken = async (req, res, next) => {
 const verifyRefreshToken = async (refreshToken) => {
     return new Promise((resolve, reject) => {
         //verify refresh token
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
-            if (err) {
-                return next(res.status(StatusCodes.UNAUTHORIZED).json(responseFormat(false, {
-                    message: `co loi o phan verifyToken!!!`
-                })).end())
-            }
-            resolve(payload)
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decode) => {
+            if (err) reject(err)
+            resolve(decode)
         })
     })
 }

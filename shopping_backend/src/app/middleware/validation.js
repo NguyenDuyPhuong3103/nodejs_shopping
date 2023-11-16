@@ -22,10 +22,6 @@ const schemas = {
         birth_year: joi.date(),
         address: joi.string(),
         avatar: joi.string(),
-        // shops: joi.array()
-        //     .items(joi.string()),
-        // products: joi.array()
-        //     .items(joi.string()),
     }),
 
     productSchema: joi.object({
@@ -39,15 +35,6 @@ const schemas = {
         images: joi.array()
             .items(joi.string()),
         description: joi.string(),
-        // user: joi.string()
-        //     .alphanum()
-        //     .required(),
-        // shop: joi.string()
-        //     .alphanum()
-        //     .required(),
-        // category: joi.string()
-        //     .alphanum()
-        //     .required(),
     }),
 
     categorySchema: joi.object({
@@ -56,10 +43,6 @@ const schemas = {
         image: joi.string()
             .required(),
         description: joi.string(),
-        // shop: joi.string()
-        //     .required(),
-        // products: joi.array()
-        //     .items(joi.string()),
     }),
 
     shopSchema: joi.object({
@@ -68,12 +51,6 @@ const schemas = {
         avatar: joi.string(),
         description: joi.string(),
         classification: joi.string(),
-        // user: joi.string()
-        //     .required(),
-        // categories: joi.array()
-        //     .items(joi.string()),
-        // products: joi.array()
-        //     .items(joi.string()),
     }),
 }
 

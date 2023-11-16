@@ -303,6 +303,13 @@ class UserController {
                 }
             }
 
+            if (req.body.role) {
+                return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, {
+                    message: `Bạn không được quyền thay đổi thành admin!!!`,
+                    error: error,
+                }))
+            }
+
             const updatedUser = await User.findByIdAndUpdate(_id, req.body, { new: true }).select('-accessToken -refreshToken -password -role')
             if (!updatedUser) {
                 cloudinary.uploader.destroy(req.file?.filename)

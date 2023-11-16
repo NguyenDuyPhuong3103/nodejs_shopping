@@ -5,8 +5,6 @@ const { validate, schemas } = require('../app/middleware/validation')
 
 const { notFound, errHandler } = require('../app/middleware/errorHandler')
 
-const uploadCloud = require('../app/middleware/uploadImages')
-
 const productsController = require('../app/controllers/ProductsController')
 
 // (1)trước khi createProduct thì nên kiểm tra xem đã có accessToken chưa (verifyAccessToken) nếu có mới được tạo.

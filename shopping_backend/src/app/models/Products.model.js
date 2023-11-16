@@ -4,12 +4,18 @@ const Schema = mongoose.Schema
 
 // Create Products model
 const products = new Schema({
-    title: { type: String, required: true, unique: true },
-    price: { type: Number, default: '0' },
-    color: { type: String, default: 'undefined' },
-    sizes: [{ type: String, default: [] }],
+    title: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, lowercase: true, unique: true },
+    description: { type: String, require: true },
+    brand: { type: String },
+    price: { type: Number, require: true, default: 0 },
+    quantity: { type: Number, require: true, default: 0 },
+    sold: { type: Number, require: true, default: 0 },
     images: [{ type: String, default: [] }],
-    description: [{ type: String, default: [] }],
+    color: { type: String, enum: ['Black', 'Grown', 'Yellow', 'Red'], default: 'undefined' },
+    ratings: [{ star: { type: String }, postedBy: { type: Schema.Types.ObjectId, ref: 'users' }, comment: { type: String } }],
+    totalNumber: { type: Number, default: 0 },
+    sizes: [{ type: String, default: [] }],
     user: { type: Schema.Types.ObjectId, ref: 'users' },
     shop: { type: Schema.Types.ObjectId, ref: 'shops' },
     category: { type: Schema.Types.ObjectId, ref: 'categories' },

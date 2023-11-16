@@ -1,136 +1,136 @@
 const Category = require('../models/Categories.model')
 const Shop = require('../models/Shops.model')
-const responseFormat = require('../../util/responseFormat.js')
-const {StatusCodes} = require('http-status-codes')
+const responseFormat = require('../../utils/responseFormat.js')
+const { StatusCodes } = require('http-status-codes')
 
 class CategoriesController {
 
     //[GET] /categories
-    async getAllCategories(req, res, next){
+    async getAllCategories(req, res, next) {
         try {
             const categories = await Category.find({})
                 .populate("products")
                 .populate('shop')
-            if (!categories || categories.length === 0 ) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+            if (!categories || categories.length === 0) {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong tim thay categories`,
                 }))
             }
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Tim thay categories`
-            },categories))
+            }, categories))
         } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server getAllCategories`,
-                error: error, 
+                error: error,
             }))
         }
     }
 
     //[GET] /categories/:id
-    async getCategoryById(req, res, next){
+    async getCategoryById(req, res, next) {
         try {
             const category = await Category.findById(req.params.id)
                 .populate("products")
                 .populate('shop')
             if (!category) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong tim thay category`,
                 }))
             }
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Tim thay category`
-            },category))
+            }, category))
         } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server getCategoryById`,
-                error: error, 
+                error: error,
             }))
         }
     }
 
     // [POST] /categories
-    async createCategory(req, res, next){
+    async createCategory(req, res, next) {
         try {
             const category = await Category.create(req.body)
             if (!category) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong tao duoc category`,
                 }))
             }
 
             const updateShop = await Shop.findByIdAndUpdate(category.shop, {
-                $addToSet:{
+                $addToSet: {
                     categories: category._id
                 }
             })
 
             if (!updateShop) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong cap nhat duoc shop`,
                 }))
             }
 
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Tao thanh cong category`
-            },category))
+            }, category))
         } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server createCategory`,
-                error: error, 
+                error: error,
             }))
         }
     }
 
     // [PUT] /categories
-    async editCategoryById(req, res, next){
+    async editCategoryById(req, res, next) {
         try {
-            const category = await Category.findByIdAndUpdate(req.params.id, req.body, {new: true})
+            const category = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true })
             if (!category) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong cap nhat duoc category`,
                 }))
             }
 
             const updateShop = await Shop.findByIdAndUpdate(category.shop, {
-                $addToSet:{
+                $addToSet: {
                     categories: category._id
                 }
             })
 
             if (!updateShop) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong cap nhat duoc shop`,
                 }))
             }
 
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Cap nhat thanh cong category`
-            },category))
+            }, category))
         } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server editCategoryById`,
-                error: error, 
+                error: error,
             }))
         }
     }
 
     // [DELETE] /categories/:id
-    async deleteCategory(req, res, next){
+    async deleteCategory(req, res, next) {
         try {
             const category = await Category.findByIdAndDelete(req.params.id)
             if (!category) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong xoa duoc category`,
                 }))
             }
-            return res.status(StatusCodes.OK).json(responseFormat(true, { 
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Xoa thanh cong category`
-            },category))
+            }, category))
         } catch (error) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server deleteCategory`,
-                error: error, 
+                error: error,
             }))
         }
     }

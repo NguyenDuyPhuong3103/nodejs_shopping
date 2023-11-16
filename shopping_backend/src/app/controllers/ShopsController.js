@@ -1,6 +1,6 @@
 const User = require('../models/Users.model')
 const Shop = require('../models/Shops.model')
-const responseFormat = require('../../util/responseFormat')
+const responseFormat = require('../../utils/responseFormat')
 const { StatusCodes } = require('http-status-codes')
 const cloudinary = require('../../config/cloudinary/cloudinary')
 const getFileName = require('../middleware/getFileName')

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const { StatusCodes } = require('http-status-codes')
-const responseFormat = require('../../util/responseFormat.js')
+const responseFormat = require('../../utils/responseFormat.js')
 
 //signAccessToken === generateAccessToken
 const signAccessToken = async (userId, role) => {
@@ -42,7 +42,7 @@ const verifyAccessToken = async (req, res, next) => {
     if (!req.headers['authorization']) {
         return next(res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
             message: `Khong co authorization o phan header duoc gui len tu client!!! (Bạn chưa đặng nhập. Vui lòng đăng nhập và thử lại!!!)`
-        })).end())
+        })))
     }
     const authHeader = req.headers['authorization']
     const bearerToken = authHeader.split(' ')
@@ -53,7 +53,7 @@ const verifyAccessToken = async (req, res, next) => {
             return res.status(StatusCodes.UNAUTHORIZED).json(responseFormat(false, {
                 message: `co loi o phan verifyAccessToken, token khong hop le!!!`,
                 err: err,
-            })).end()
+            }))
         }
         req.user = decode
         next()

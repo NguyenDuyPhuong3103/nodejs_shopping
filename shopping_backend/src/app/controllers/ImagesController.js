@@ -1,7 +1,7 @@
 // //import collection (Course) in mongoDB compass => Course export model (Schema)
 const cloudinary = require("../../config/cloudinary/cloudinary");
 const { StatusCodes } = require("http-status-codes");
-const responseFormat = require("../../util/responseFormat.js");
+const responseFormat = require("../../utils/responseFormat.js");
 class ImgsController {
     //[POST] /
     async uploadImages(req, res, next) {

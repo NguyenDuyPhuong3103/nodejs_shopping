@@ -1,5 +1,5 @@
 const joi = require('joi')
-const responseFormat = require('../../util/responseFormat.js')
+const responseFormat = require('../../utils/responseFormat.js')
 const { StatusCodes } = require('http-status-codes')
 const cloudinary = require('cloudinary').v2
 

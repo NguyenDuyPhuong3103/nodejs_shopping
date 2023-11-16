@@ -1,4 +1,4 @@
-const responseFormat = require('../../util/responseFormat')
+const responseFormat = require('../../utils/responseFormat')
 
 const notFound = (req, res, next) => {
     const error = new Error(`Route ${req.originalUrl} not found!`)

@@ -2,7 +2,7 @@ const Product = require('../models/Products.model')
 const Category = require('../models/Categories.model')
 const Shop = require('../models/Shops.model')
 const User = require('../models/Users.model')
-const responseFormat = require('../../util/responseFormat.js')
+const responseFormat = require('../../utils/responseFormat.js')
 const { StatusCodes } = require('http-status-codes')
 // const pageSize = 2
 

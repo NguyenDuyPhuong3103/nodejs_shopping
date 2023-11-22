@@ -49,9 +49,6 @@ const schemas = {
     categorySchema: joi.object({
         name: joi.string()
             .required(),
-        image: joi.string()
-            .required(),
-        description: joi.string(),
     }),
 
     shopSchema: joi.object({

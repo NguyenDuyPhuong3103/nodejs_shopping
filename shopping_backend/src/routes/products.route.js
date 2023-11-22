@@ -3,11 +3,11 @@ const router = express.Router()
 
 const { validate, schemas } = require('../app/middleware/validation')
 
-const { notFound, errHandler } = require('../app/middleware/errorHandler')
-
 const { verifyAccessToken } = require('../app/middleware/jwtService')
 
 const isAdmin = require('../app/middleware/authorization')
+
+const { notFound, errHandler } = require('../app/middleware/errorHandler')
 
 const productsController = require('../app/controllers/ProductsController')
 

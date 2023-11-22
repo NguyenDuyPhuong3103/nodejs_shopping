@@ -190,7 +190,7 @@ class UserController {
         }
     }
 
-    //[GET] /resetPassword
+    // Cấp lại mật khẩu mới khi quên mật khẩu cũ
     // 1./ Client gửi mail
     // 2./ Server check xem mail có hợp lệ hay không => gửi mail + kèm theo link (password change token)
     // 3./ Client check mail => click link
@@ -198,6 +198,7 @@ class UserController {
     // 5./ Check token có giống với token mà server gửi mail hay không
     // 6./ Change password
 
+    //[GET] /forgotPassword
     async forgotPassword(req, res, next) {
         try {
             const { email } = req.query

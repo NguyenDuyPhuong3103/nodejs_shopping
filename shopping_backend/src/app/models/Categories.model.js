@@ -3,9 +3,9 @@ const Schema = mongoose.Schema
 
 // Create Categories model
 const categories = new Schema({
-    name: {type: String, default: 'UnCategorized', unique: true},
-    shop: {type: Schema.Types.ObjectId, ref: 'shops'} ,
-    products: [{type: Schema.Types.ObjectId, ref: 'products'}],
+    name: { type: String, require: true, default: 'UnCategorized', unique: true },
+    shop: { type: Schema.Types.ObjectId, ref: 'shops' },
+    products: [{ type: Schema.Types.ObjectId, ref: 'products' }],
 }, {
     timestamps: true,
 })

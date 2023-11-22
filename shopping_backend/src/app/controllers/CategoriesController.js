@@ -5,10 +5,11 @@ const { StatusCodes } = require('http-status-codes')
 
 class CategoriesController {
 
-    //[GET] /categories
-    async getAllCategories(req, res, next) {
+    //[GET] /
+    async getCategories(req, res, next) {
         try {
             const categories = await Category.find({})
+                .select('name _id')
                 .populate("products")
                 .populate('shop')
             if (!categories || categories.length === 0) {
@@ -27,10 +28,11 @@ class CategoriesController {
         }
     }
 
-    //[GET] /categories/:id
+    //[GET] /:id
     async getCategoryById(req, res, next) {
         try {
             const category = await Category.findById(req.params.id)
+                .select('name _id')
                 .populate("products")
                 .populate('shop')
             if (!category) {
@@ -49,7 +51,7 @@ class CategoriesController {
         }
     }
 
-    // [POST] /categories
+    // [POST] /
     async createCategory(req, res, next) {
         try {
             const category = await Category.create(req.body)
@@ -59,22 +61,23 @@ class CategoriesController {
                 }))
             }
 
-            const updateShop = await Shop.findByIdAndUpdate(category.shop, {
-                $addToSet: {
-                    categories: category._id
-                }
-            })
+            // const updateShop = await Shop.findByIdAndUpdate(category.shop, {
+            //     $addToSet: {
+            //         categories: category._id
+            //     }
+            // })
 
-            if (!updateShop) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
-                    message: `Khong cap nhat duoc shop`,
-                }))
-            }
+            // if (!updateShop) {
+            //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+            //         message: `Khong cap nhat duoc shop`,
+            //     }))
+            // }
 
             return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Tao thanh cong category`
             }, category))
         } catch (error) {
+            console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server createCategory`,
                 error: error,
@@ -82,8 +85,8 @@ class CategoriesController {
         }
     }
 
-    // [PUT] /categories
-    async editCategoryById(req, res, next) {
+    // [PUT] /
+    async updateCategoryById(req, res, next) {
         try {
             const category = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true })
             if (!category) {
@@ -115,7 +118,7 @@ class CategoriesController {
         }
     }
 
-    // [DELETE] /categories/:id
+    // [DELETE] /:id
     async deleteCategory(req, res, next) {
         try {
             const category = await Category.findByIdAndDelete(req.params.id)

@@ -7,8 +7,8 @@ const getFileName = require('../middleware/getFileName')
 
 class ShopsController {
 
-    //[GET] /shops
-    async getAllShops(req, res, next) {
+    //[GET] /
+    async getShops(req, res, next) {
         try {
             const shops = await Shop.find({})
                 .populate("products")
@@ -30,7 +30,7 @@ class ShopsController {
         }
     }
 
-    //[GET] /shops/:id
+    //[GET] /:id
     async getShopById(req, res, next) {
         try {
             const shop = await Shop.findById(req.params.id)
@@ -53,7 +53,7 @@ class ShopsController {
         }
     }
 
-    // [POST] /shops
+    // [POST] /
     async createShop(req, res, next) {
         try {
 
@@ -94,7 +94,7 @@ class ShopsController {
         }
     }
 
-    // [PUT] /shops
+    // [PUT] /
     async updateShopById(req, res, next) {
         try {
 
@@ -141,7 +141,7 @@ class ShopsController {
         }
     }
 
-    // [DELETE] /shops/:id
+    // [DELETE] /:id
     async deleteShop(req, res, next) {
         try {
             const shop = await Shop.findById(req.params.id)

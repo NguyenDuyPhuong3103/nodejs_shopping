@@ -9,7 +9,7 @@ const slugify = require('slugify')
 
 class ProductsController {
 
-    //[GET] /products
+    //[GET] /
 
     // Cách 1: Sử dụng panigation
     // async getProducts(req, res, next) {
@@ -76,7 +76,6 @@ class ProductsController {
                 queryCommand = queryCommand.select(fields)
             }
 
-
             //Panigation
             //Limit: số lượng object lấy về trong 1 lần gọi API
             //Skip: bỏ qua bao nhiêu object 
@@ -115,7 +114,7 @@ class ProductsController {
         }
     }
 
-    //[GET] /products/:id
+    //[GET] /:id
     async getProductById(req, res, next) {
         try {
             const product = await Product.findById(req.params.id)
@@ -138,7 +137,7 @@ class ProductsController {
         }
     }
 
-    // [POST] /products
+    // [POST] /
     async createProduct(req, res, next) {
         try {
             if (Object.keys(req.body) === 0) {
@@ -206,7 +205,7 @@ class ProductsController {
         }
     }
 
-    // [PUT] /products
+    // [PUT] /
     async updateProductById(req, res, next) {
         try {
             if (req.body && req.body.title) req.body.slug = slugify(req.body.title)
@@ -266,7 +265,7 @@ class ProductsController {
         }
     }
 
-    // [DELETE] /products/:id
+    // [DELETE]/:id
     async deleteProduct(req, res, next) {
         try {
             const product = await Product.findByIdAndDelete(req.params.id)
@@ -285,7 +284,7 @@ class ProductsController {
         }
     }
 
-    // [DELETE] /products/ratings
+    // [DELETE] /ratings
     async ratingsProduct(req, res, next) {
         try {
             const { _id } = req.user
@@ -315,11 +314,17 @@ class ProductsController {
             }
 
             //totalRatings
+            const updatedProduct = await Product.findById(productId)
+            const ratingCount = updatedProduct.ratings.length
+            const sumRatingProduct = updatedProduct.ratings.reduce((sum, el) => sum + +el.star, 0)
+            updatedProduct.totalRatings = Math.round(sumRatingProduct * 10 / ratingCount) / 10
+
+            await updatedProduct.save()
 
 
             return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `ratings thành công!!!`
-            }))
+            }, updatedProduct))
         } catch (error) {
             console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {

@@ -27,14 +27,23 @@ const schemas = {
     productSchema: joi.object({
         title: joi.string()
             .required(),
+        description: joi.string()
+            .required(),
         price: joi.number()
             .required(),
         color: joi.string(),
-        sizes: joi.array()
-            .items(joi.string()),
+        brand: joi.string(),
+        price: joi.number()
+            .required(),
+        quantity: joi.number()
+            .required(),
+        sold: joi.number()
+            .required(),
         images: joi.array()
             .items(joi.string()),
-        description: joi.string(),
+        color: joi.string(),
+        sizes: joi.array()
+            .items(joi.string()),
     }),
 
     categorySchema: joi.object({
@@ -60,10 +69,11 @@ function validate(schema) {
             await schema.validateAsync({ ...req.body, avatar: req.file?.path }, { allowUnknown: true })
             next()
         } catch (error) {
+            console.log(error)
             if (req.file) {
                 cloudinary.uploader.destroy(req.file.filename)
-                return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { message: 'Nội dung không hợp lệ !!!' }, error))
             }
+            return res.status(StatusCodes.BAD_REQUEST).json(responseFormat(false, { message: 'Nội dung không hợp lệ !!!' }, error))
         }
     }
 }

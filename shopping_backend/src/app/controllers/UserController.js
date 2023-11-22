@@ -383,8 +383,8 @@ class UserController {
     //[PUT] /
     async updateUserByAdmin(req, res, next) {
         try {
-            const { _id } = req.params
-            if (!_id) {
+            const { id } = req.params
+            if (!id) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Không tìm thấy giá trị. Mời nhập lại!!!`,
                 }))
@@ -392,14 +392,14 @@ class UserController {
 
             if (req.file) {
                 req.body.avatar = req.file.path
-                const user = await User.findById(_id)
+                const user = await User.findById(id)
                 if (user) {
                     const oldAvatar = getFileName(user.avatar)
                     cloudinary.uploader.destroy(oldAvatar)
                 }
             }
 
-            const updatedUser = await User.findByIdAndUpdate(_id, req.body, { new: true }).select('-accessToken -refreshToken -password -role')
+            const updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true }).select('-accessToken -refreshToken -password -role')
             if (!updatedUser) {
                 cloudinary.uploader.destroy(req?.file?.filename)
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {

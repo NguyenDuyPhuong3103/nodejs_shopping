@@ -4,111 +4,109 @@ const Shop = require('../models/Shops.model')
 const User = require('../models/Users.model')
 const responseFormat = require('../../utils/responseFormat.js')
 const { StatusCodes } = require('http-status-codes')
+const slugify = require('slugify')
 // const pageSize = 2
 
 class ProductsController {
 
     //[GET] /products
-    // async getProducts(req, res, next){
+
+    // Cách 1: Sử dụng panigation
+    // async getProducts(req, res, next) {
     //     try {
-    //         let page = req.query.page
+    //         const {
+    //             page = 1,
+    //             limit = 7,
+    //             sort = "createdAt",
+    //             order = "asc"
+    //         } = req.query
 
-    //         if (page) {
-    //             //get page
-    //             page = parseInt(page)
-    //             if (page < 1) {
-    //                 page = 1 
-    //             }
-
-    //             const startPage = Math.max((page - 1) * pageSize, 0)
-
-    //             const products = await Product.find({})
-    //                 .populate('category')
-    //                 .populate('shop')
-    //                 .populate('user')
-    //                 .skip(startPage)
-    //                 .limit(pageSize)
-
-    //             if (!products) {
-    //                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-    //                     message: `Khong tim thay products`,
-    //                 }))
-    //             }
-
-    //             const total = await Product.countDocuments({})
-    //             if (!total) {
-    //                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-    //                     message: `Khong tim thay total`,
-    //                 }))
-    //             }
-
-    //             const totalPage = await Math.ceil(total / pageSize)
-    //             if (!totalPage) {
-    //                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-    //                     message: `Khong tim thay totalPage`,
-    //                 }))
-    //             }
-
-    //             const resData = {
-    //                 pageSize: pageSize,
-    //                 total: total,
-    //                 totalPage: totalPage,
-    //                 data: products,
-    //             }
-
-    //             return res.status(StatusCodes.OK).json(responseFormat(true, { 
-    //                 message: `Tim thay tất cả product`
-    //             },resData))
-
-    //         } else {
-    //             const products = await Product.find({})
-    //                 .populate('category')
-    //                 .populate('shop')
-    //                 .populate('user')
-    //             if (!products || products.length === 0 ) {
-    //                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-    //                     message: `Khong tim thay products`,
-    //                 }))
-    //             }
-    //             return res.status(StatusCodes.OK).json(responseFormat(true, { 
-    //                 message: `Tim thay products`
-    //             },products))
+    //         const options = {
+    //             page,
+    //             limit,
+    //             sort: {
+    //                 [sort]: order === "asc" ? 1 : -1
+    //             },
+    //             populate: ['category', 'shop', 'user']
     //         }
+
+    //         const data = await Product.paginate({}, options)
+    //         if (!data.docs || data.docs.length === 0) {
+    //             return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+    //                 message: `Khong tim thay data`,
+    //             }))
+    //         }
+    //         return res.status(StatusCodes.OK).json(responseFormat(true, {
+    //             message: `Tim thay data`
+    //         }, data))
     //     } catch (error) {
-    //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, { 
+    //         console.log(error)
+    //         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
     //             message: `Co loi o server getAllProducts`,
-    //             error: error, 
     //         }))
     //     }
     // }
 
-    async getProducts(req, res, next) {
+    //Cách 2: sử dụng javascript thuần
+    async getProducts(req, res, next) {    // 17/11
         try {
-            const {
-                page = 1,
-                limit = 7,
-                sort = "createdAt",
-                order = "asc"
-            } = req.query
+            const queries = { ...req.query }
+            //Tách các trường đặc biệt ra khỏi queries 
+            const excludeFields = ['limit', 'sort', 'page', 'fields']
+            excludeFields.forEach(el => delete queries[el])
 
-            const options = {
-                page,
-                limit,
-                sort: {
-                    [sort]: order === "asc" ? 1 : -1
-                },
-                populate: ['category', 'shop', 'user']
+            //Format lại các operators cho đúng cú pháp của mongoose
+            let queryString = JSON.stringify(queries)
+            queryString = queryString.replace(/\b(gte|gt|lt|lte)\b/g, matchedEl => `$${matchedEl}`)
+            const formatedQueries = JSON.parse(queryString)
+
+            //Filtering 
+            if (queries?.title) formatedQueries.title = { $regex: queries.title, $options: 'i' }
+            let queryCommand = Product.find(formatedQueries)
+
+            // Sorting
+            if (req.query.sort) {
+                const sortBy = req.query.sort.split(',').join(' ')
+                queryCommand = queryCommand.sort(sortBy)
             }
 
-            const data = await Product.paginate({}, options)
-            if (!data.docs || data.docs.length === 0) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
-                    message: `Khong tim thay data`,
-                }))
+            //Fields limiting (hạn chế trường lấy về)
+            if (req.query.fields) {
+                const fields = req.query.fields.split(',').join(' ')
+                queryCommand = queryCommand.select(fields)
             }
-            return res.status(StatusCodes.OK).json(responseFormat(true, {
-                message: `Tim thay data`
-            }, data))
+
+
+            //Panigation
+            //Limit: số lượng object lấy về trong 1 lần gọi API
+            //Skip: bỏ qua bao nhiêu object 
+            const page = +req.query.page || 1
+            const limit = +req.query.limit || process.env.LIMIT_PRODUCT
+            const skip = (page - 1) * limit
+            queryCommand.skip(skip).limit(limit)
+
+            //Execute query
+            // Số lượng sản phẩm thỏa mãn điều kiện (counts) !== Số lượng sản phẩm trả về 1 lần gọi API
+            queryCommand.exec()
+                .then(async (response) => {
+                    const counts = await Product.find(formatedQueries).countDocuments()
+
+                    if (counts) {
+                        return res.status(StatusCodes.OK).json(responseFormat(true, {
+                            message: `Tìm thấy dữ liệu phù hợp với điều kiện!!!`
+                        }, {
+                            counts,
+                            product: response,
+                        }))
+                    }
+                })
+                .catch(error => {
+                    console.log(error)
+                    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
+                        message: `Có lỗi xảy ra, không thể thực hiện yêu cầu!!!`,
+                    }, error))
+                })
+
         } catch (error) {
             console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
@@ -143,52 +141,62 @@ class ProductsController {
     // [POST] /products
     async createProduct(req, res, next) {
         try {
-            const product = await Product.create(req.body)
-            if (!product) {
+            if (Object.keys(req.body) === 0) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
-                    message: `Khong tao duoc product`,
+                    message: `Không tìm thấy dữ liệu cần tạo!!!`,
                 }))
             }
 
-            // const updateCategory = await Category.findByIdAndUpdate(product.category, {
-            //     $addToSet:{
-            //         products: product._id
-            //     }
-            // })
+            if (req.body && req.body.title) {
+                req.body.slug = slugify(req.body.title)
 
-            // if (!updateCategory) {
-            //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-            //         message: `Khong cap nhat duoc category`,
-            //     }))
-            // }
+                const product = await Product.create(req.body)
+                if (!product) {
+                    return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+                        message: `Khong tao duoc product`,
+                    }))
+                }
 
-            // const updateShop = await Shop.findByIdAndUpdate(product.shop, {
-            //     $addToSet:{
-            //         products: product._id
-            //     }
-            // })
+                // const updateCategory = await Category.findByIdAndUpdate(product.category, {
+                //     $addToSet:{
+                //         products: product._id
+                //     }
+                // })
 
-            // if (!updateShop) {
-            //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-            //         message: `Khong cap nhat duoc shop`,
-            //     }))
-            // }
+                // if (!updateCategory) {
+                //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                //         message: `Khong cap nhat duoc category`,
+                //     }))
+                // }
 
-            // const updateUser = await User.findByIdAndUpdate(product.user, {
-            //     $addToSet:{
-            //         products: product._id
-            //     }
-            // })
+                // const updateShop = await Shop.findByIdAndUpdate(product.shop, {
+                //     $addToSet:{
+                //         products: product._id
+                //     }
+                // })
 
-            // if (!updateUser) {
-            //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
-            //         message: `Khong cap nhat duoc user`,
-            //     }))
-            // }
+                // if (!updateShop) {
+                //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                //         message: `Khong cap nhat duoc shop`,
+                //     }))
+                // }
 
-            return res.status(StatusCodes.OK).json(responseFormat(true, {
-                message: `Tao thanh cong product`
-            }, product))
+                // const updateUser = await User.findByIdAndUpdate(product.user, {
+                //     $addToSet:{
+                //         products: product._id
+                //     }
+                // })
+
+                // if (!updateUser) {
+                //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                //         message: `Khong cap nhat duoc user`,
+                //     }))
+                // }
+
+                return res.status(StatusCodes.OK).json(responseFormat(true, {
+                    message: `Tao thanh cong product`
+                }, product))
+            }
         } catch (error) {
             console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
@@ -201,6 +209,8 @@ class ProductsController {
     // [PUT] /products
     async updateProductById(req, res, next) {
         try {
+            if (req.body && req.body.title) req.body.slug = slugify(req.body.title)
+
             const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true })
             if (!product) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
@@ -208,41 +218,41 @@ class ProductsController {
                 }))
             }
 
-            const updateCategory = await Category.findByIdAndUpdate(product.category, {
-                $addToSet: {
-                    products: product._id
-                }
-            })
+            // const updateCategory = await Category.findByIdAndUpdate(product.category, {
+            //     $addToSet: {
+            //         products: product._id
+            //     }
+            // })
 
-            if (!updateCategory) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
-                    message: `Khong cap nhat duoc category`,
-                }))
-            }
+            // if (!updateCategory) {
+            //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+            //         message: `Khong cap nhat duoc category`,
+            //     }))
+            // }
 
-            const updateShop = await Shop.findByIdAndUpdate(product.shop, {
-                $addToSet: {
-                    products: product._id
-                }
-            })
+            // const updateShop = await Shop.findByIdAndUpdate(product.shop, {
+            //     $addToSet: {
+            //         products: product._id
+            //     }
+            // })
 
-            if (!updateShop) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
-                    message: `Khong cap nhat duoc shop`,
-                }))
-            }
+            // if (!updateShop) {
+            //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+            //         message: `Khong cap nhat duoc shop`,
+            //     }))
+            // }
 
-            const updateUser = await User.findByIdAndUpdate(product.user, {
-                $addToSet: {
-                    products: product._id
-                }
-            })
+            // const updateUser = await User.findByIdAndUpdate(product.user, {
+            //     $addToSet: {
+            //         products: product._id
+            //     }
+            // })
 
-            if (!updateUser) {
-                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
-                    message: `Khong cap nhat duoc user`,
-                }))
-            }
+            // if (!updateUser) {
+            //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+            //         message: `Khong cap nhat duoc user`,
+            //     }))
+            // }
 
             return res.status(StatusCodes.OK).json(responseFormat(true, {
                 message: `Cap nhat thanh cong product`
@@ -269,6 +279,49 @@ class ProductsController {
                 message: `Xoa thanh cong product`
             }, product))
         } catch (error) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
+                message: `Co loi o server deleteProduct`,
+            }))
+        }
+    }
+
+    // [DELETE] /products/ratings
+    async ratingsProduct(req, res, next) {
+        try {
+            const { _id } = req.user
+            const { star, comment, productId } = req.body
+            if (!star || !productId) {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+                    message: `Thiếu dữ liệu để thực hiện yêu cầu!!!`,
+                }))
+            }
+
+            const ratingsProduct = await Product.findById(productId)
+            const alreadyRating = ratingsProduct?.ratings?.find(el => el.postedBy.toString() === _id)
+
+            if (alreadyRating) {
+                //Th1: product ĐÃ có người đánh giá
+                // Update star và comment
+                await Product.updateOne(
+                    { "ratings.postedBy": _id },
+                    { $set: { "ratings.$.star": star, "ratings.$.comment": comment } },
+                    { new: true })
+            } else {
+                //Th2: product CHƯA có người đánh giá
+                // Add star và comment
+                await Product.findByIdAndUpdate(productId, {
+                    $push: { ratings: { star, comment, postedBy: _id } }
+                }, { new: true })
+            }
+
+            //totalRatings
+
+
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
+                message: `ratings thành công!!!`
+            }))
+        } catch (error) {
+            console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server deleteProduct`,
             }))

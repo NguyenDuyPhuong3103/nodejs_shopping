@@ -12,7 +12,7 @@ const products = new Schema({
     quantity: { type: Number, require: true, default: 0 },
     sold: { type: Number, require: true, default: 0 },
     images: [{ type: String, default: [] }],
-    color: { type: String, enum: ['Black', 'Grown', 'Yellow', 'Red'], default: 'undefined' },
+    color: { type: String, enum: ['Black', 'Grown', 'Yellow', 'Red'], default: 'Red' },
     ratings: [{ star: { type: String }, postedBy: { type: Schema.Types.ObjectId, ref: 'users' }, comment: { type: String } }],
     totalNumber: { type: Number, default: 0 },
     sizes: [{ type: String, default: [] }],

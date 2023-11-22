@@ -13,6 +13,8 @@ const { uploadUserToCloud } = require('../app/middleware/uploadImages')
 
 const userController = require('../app/controllers/UserController')
 
+router.get('/', verifyAccessToken, isAdmin, userController.getInfoUsers)
+router.put('/:id', verifyAccessToken, isAdmin, uploadUserToCloud.single('avatar'), userController.updateUserByAdmin)
 router.post('/register', uploadUserToCloud.single('avatar'), validate(schemas.userSchema), userController.register)
 router.post('/login', validate(schemas.userSchema), userController.login)
 router.get('/getInfoUser', verifyAccessToken, userController.getInfoUser)
@@ -21,9 +23,7 @@ router.get('/logout', verifyAccessToken, userController.logout)
 router.get('/forgotPassword', userController.forgotPassword)
 router.put('/resetPassword', userController.resetPassword)
 router.put('/current', verifyAccessToken, uploadUserToCloud.single('avatar'), userController.updateUser)
-router.put('/:_id', verifyAccessToken, isAdmin, uploadUserToCloud.single('avatar'), userController.updateUserByAdmin)
 router.delete('/:id', verifyAccessToken, isAdmin, userController.deleteUser)
-router.get('/', verifyAccessToken, isAdmin, userController.getInfoUsers)
 router.use(notFound)
 router.use(errHandler)
 

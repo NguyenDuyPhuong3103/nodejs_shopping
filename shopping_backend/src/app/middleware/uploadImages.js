@@ -21,4 +21,8 @@ const uploadShopToCloud = multer({ storage: shopAvatarStorage })
 const userAvatarStorage = createStorage('shopping-nodejs/user-avatar')
 const uploadUserToCloud = multer({ storage: userAvatarStorage })
 
-module.exports = { uploadShopToCloud, uploadUserToCloud }
+// Đối tượng lưu trữ cho ảnh của sản phẩm
+const productAvatarStorage = createStorage('shopping-nodejs/product-images')
+const uploadProductToCloud = multer({ storage: productAvatarStorage })
+
+module.exports = { uploadShopToCloud, uploadUserToCloud, uploadProductToCloud }

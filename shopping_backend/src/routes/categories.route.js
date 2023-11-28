@@ -11,11 +11,11 @@ const { notFound, errHandler } = require('../app/middleware/errorHandler')
 
 const categoriesController = require('../app/controllers/CategoriesController')
 
-router.get('/', categoriesController.getCategories)
-router.get('/:id', categoriesController.getCategoryById)
-router.post('/', verifyAccessToken, isAdmin, validate(schemas.categorySchema), categoriesController.createCategory)
 router.put('/:id', verifyAccessToken, isAdmin, validate(schemas.categorySchema), categoriesController.updateCategoryById)
 router.delete('/:id', verifyAccessToken, isAdmin, categoriesController.deleteCategory)
+router.post('/', verifyAccessToken, isAdmin, validate(schemas.categorySchema), categoriesController.createCategory)
+router.get('/:id', categoriesController.getCategoryById)
+router.get('/', categoriesController.getCategories)
 router.use(notFound)
 router.use(errHandler)
 

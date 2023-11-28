@@ -33,10 +33,10 @@ class ShopsController {
     //[GET] /:id
     async getShopById(req, res, next) {
         try {
-            const shop = await Shop.findById(req.params.id)
-                .populate("products")
-                .populate("categories")
-                .populate("user")
+
+            const shop = await Shop.findByIdAndUpdate(req.params.id, { $inc: { numberViews: 1 } }, { new: true })
+                .populate('products categories user likes dislikes', 'email name')
+
             if (!shop) {
                 return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
                     message: `Khong tim thay shop`,
@@ -46,6 +46,7 @@ class ShopsController {
                 message: `Tim thay shop`
             }, shop))
         } catch (error) {
+            console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server getShopById`,
                 error: error,
@@ -162,6 +163,86 @@ class ShopsController {
         } catch (error) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server deleteShop`,
+                error: error,
+            }))
+        }
+    }
+
+    //[PUT] /likes
+    async likesShop(req, res, next) {
+        try {
+            const { _id } = req.user
+            const { shopId } = req.params
+            if (!shopId) {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+                    message: `Thiếu dữ liệu tải lên !!!`,
+                }))
+            }
+
+            const shop = await Shop.findById(shopId)
+            const alreadyDisliked = shop?.dislikes?.find(el => el.toString() === _id)
+            if (alreadyDisliked) {
+                const response = await Shop.findByIdAndUpdate(shopId, { $pull: { dislikes: _id } }, { new: true })
+                return res.status(StatusCodes.OK).json(responseFormat(true, {
+                    message: 'Thành công'
+                }, response))
+            }
+            const isLiked = shop?.likes.find(el => el.toString() === _id)
+            if (isLiked) {
+                const response = await Shop.findByIdAndUpdate(shopId, { $pull: { likes: _id } }, { new: true })
+                return res.status(StatusCodes.OK).json(responseFormat(true, {
+                    message: 'Thành công'
+                }, response))
+            } else {
+                const response = await Shop.findByIdAndUpdate(shopId, { $push: { likes: _id } }, { new: true })
+                return res.status(StatusCodes.OK).json(responseFormat(true, {
+                    message: 'Thành công'
+                }, response))
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
+                message: `Co loi o server likesShop`,
+                error: error,
+            }))
+        }
+    }
+
+    //[PUT] /dislikes
+    async dislikesShop(req, res, next) {
+        try {
+            const { _id } = req.user
+            const { shopId } = req.params
+            if (!shopId) {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+                    message: `Thiếu dữ liệu tải lên !!!`,
+                }))
+            }
+
+            const shop = await Shop.findById(shopId)
+            const alreadyLiked = shop?.likes?.find(el => el.toString() === _id)
+            if (alreadyLiked) {
+                const response = await Shop.findByIdAndUpdate(shopId, { $pull: { likes: _id } }, { new: true })
+                return res.status(StatusCodes.OK).json(responseFormat(true, {
+                    message: 'Thành công'
+                }, response))
+            }
+            const isDisliked = shop?.dislikes.find(el => el.toString() === _id)
+            if (isDisliked) {
+                const response = await Shop.findByIdAndUpdate(shopId, { $pull: { dislikes: _id } }, { new: true })
+                return res.status(StatusCodes.OK).json(responseFormat(true, {
+                    message: 'Thành công'
+                }, response))
+            } else {
+                const response = await Shop.findByIdAndUpdate(shopId, { $push: { dislikes: _id } }, { new: true })
+                return res.status(StatusCodes.OK).json(responseFormat(true, {
+                    message: 'Thành công'
+                }, response))
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
+                message: `Co loi o server dislikesShop`,
                 error: error,
             }))
         }

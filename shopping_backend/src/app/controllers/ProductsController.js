@@ -205,6 +205,76 @@ class ProductsController {
         }
     }
 
+    // [POST] /
+    async createProductHaveCloudinary(req, res, next) {
+        try {
+            if (Object.keys(req.body) === 0) {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+                    message: `Không tìm thấy dữ liệu cần tạo!!!`,
+                }))
+            }
+
+            if (req.body && req.body.title) {
+                req.body.slug = slugify(req.body.title)
+
+                const product = await Product.create(req.body)
+                if (!product) {
+                    req.files.forEach(el => cloudinary.uploader.destroy(el.filename))
+                    return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+                        message: `Khong tao duoc product`,
+                    }))
+                } else {
+
+                    // const updateCategory = await Category.findByIdAndUpdate(product.category, {
+                    //     $addToSet:{
+                    //         products: product._id
+                    //     }
+                    // })
+
+                    // if (!updateCategory) {
+                    //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                    //         message: `Khong cap nhat duoc category`,
+                    //     }))
+                    // }
+
+                    // const updateShop = await Shop.findByIdAndUpdate(product.shop, {
+                    //     $addToSet:{
+                    //         products: product._id
+                    //     }
+                    // })
+
+                    // if (!updateShop) {
+                    //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                    //         message: `Khong cap nhat duoc shop`,
+                    //     }))
+                    // }
+
+                    // const updateUser = await User.findByIdAndUpdate(product.user, {
+                    //     $addToSet:{
+                    //         products: product._id
+                    //     }
+                    // })
+
+                    // if (!updateUser) {
+                    //     return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, { 
+                    //         message: `Khong cap nhat duoc user`,
+                    //     }))
+                    // }
+
+                    return res.status(StatusCodes.OK).json(responseFormat(true, {
+                        message: `Tao thanh cong product`
+                    }, product))
+                }
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
+                message: `Co loi o server createProduct`,
+                error: error,
+            }))
+        }
+    }
+
     // [PUT] /
     async updateProductById(req, res, next) {
         try {
@@ -284,7 +354,7 @@ class ProductsController {
         }
     }
 
-    // [DELETE] /ratings
+    // [PUT] /ratings
     async ratingsProduct(req, res, next) {
         try {
             const { _id } = req.user
@@ -329,6 +399,36 @@ class ProductsController {
             console.log(error)
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
                 message: `Co loi o server deleteProduct`,
+            }))
+        }
+    }
+
+    // [DELETE]/
+    async uploadImageProduct(req, res, next) {
+        try {
+            const { id } = req.params
+            if (!id) {
+                // Xóa mảng nhiều ảnh trên cloudinary
+                req.files.forEach(el => cloudinary.uploader.destroy(el.filename))
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+                    message: `Thiếu dữ liệu sản phẩm để thực hiện yêu cầu!!!`,
+                }))
+            }
+
+            if (!req.files) {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+                    message: `Thiếu dữ liệu để thực hiện yêu cầu!!!`,
+                }))
+            }
+
+            const response = await Product.findByIdAndUpdate(id, { $push: { images: { $each: req.files.map(el => el.path) } } }, { new: true })
+            return res.status(StatusCodes.OK).json(responseFormat(true, {
+                message: `Tải ảnh lên thành công`
+            }, response))
+        } catch (error) {
+            console.log(error)
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
+                message: `Co loi o server uploadImageProduct`,
             }))
         }
     }

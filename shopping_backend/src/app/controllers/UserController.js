@@ -86,8 +86,8 @@ class UserController {
                 return res.status(StatusCodes.ACCEPTED).json(responseFormat(true, {
                     message: 'Ban da dang nhap thanh cong!!!'
                 }, {
-                    userData,
-                    accessToken
+                    accessToken,
+                    userData
                 }))
             }
         } catch (error) {

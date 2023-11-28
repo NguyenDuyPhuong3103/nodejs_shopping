@@ -3,21 +3,24 @@ const router = express.Router()
 
 const { validate, schemas } = require('../app/middleware/validation')
 
-const { notFound, errHandler } = require('../app/middleware/errorHandler')
-
 const { verifyAccessToken } = require('../app/middleware/jwtService')
+
+const isAdmin = require('../app/middleware/authorization')
+
+const { notFound, errHandler } = require('../app/middleware/errorHandler')
 
 const { uploadShopToCloud } = require('../app/middleware/uploadImages')
 
 const shopsController = require('../app/controllers/ShopsController')
 
-router.get('/', shopsController.getShops)
-router.post('/', uploadShopToCloud.single('avatar'), validate(schemas.shopSchema), shopsController.createShop)
-//put, delete cần có user mà user đã tạo ra product đó cấp quyền
-// router.put('/:id', verifyAccessToken, uploadShopToCloud.single('avatar'), validate(schemas.shopSchema), shopsController.updateShopById)
-router.put('/:id', uploadShopToCloud.single('avatar'), validate(schemas.shopSchema), shopsController.updateShopById)
-router.delete('/:id', shopsController.deleteShop)
+router.put('/likes/:shopId', verifyAccessToken, shopsController.likesShop)
+router.put('/dislikes/:shopId', verifyAccessToken, shopsController.dislikesShop)
+router.put('/:id', verifyAccessToken, isAdmin, uploadShopToCloud.single('avatar'), validate(schemas.shopSchema), shopsController.updateShopById)
+router.post('/', verifyAccessToken, uploadShopToCloud.single('avatar'), validate(schemas.shopSchema), shopsController.createShop)
+router.delete('/:id', verifyAccessToken, isAdmin, shopsController.deleteShop)
 router.get('/:id', shopsController.getShopById)
+router.get('/', shopsController.getShops)
+
 router.use(notFound)
 router.use(errHandler)
 

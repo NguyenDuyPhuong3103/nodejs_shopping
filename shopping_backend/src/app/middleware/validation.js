@@ -58,6 +58,16 @@ const schemas = {
         description: joi.string(),
         classification: joi.string(),
     }),
+
+    billSchema: joi.object({
+        products: joi.array()
+            .required(),
+        status: joi.string(),
+        paymentIntent: joi.object()
+            .required(),
+        orderBy: joi.string()
+            .required(),
+    }),
 }
 
 function validate(schema) {

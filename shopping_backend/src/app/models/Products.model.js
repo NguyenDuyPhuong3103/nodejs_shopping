@@ -11,7 +11,7 @@ const products = new Schema({
     price: { type: Number, require: true, default: 0 },
     quantity: { type: Number, require: true, default: 0 },
     sold: { type: Number, require: true, default: 0 },
-    images: [{ type: String, default: [] }],
+    images: [{ type: [String], default: [] }],
     color: { type: String, enum: ['Black', 'Grown', 'Yellow', 'Red'], default: 'Red' },
     ratings: [{ star: { type: String }, postedBy: { type: Schema.Types.ObjectId, ref: 'users' }, comment: { type: String } }],
     totalRatings: { type: Number, default: 0 },

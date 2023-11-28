@@ -6,6 +6,7 @@ const shopsRouter = require('./shops.route')
 const userRouter = require('./user.route')
 const siteRouter = require('./site.route')
 const insertRouter = require('./insert.route')
+const billRouter = require('./bills.route')
 const imagesRouter = require('./images.route')
 
 baseRouter.use('/products', productsRouter)
@@ -14,6 +15,7 @@ baseRouter.use('/shops', shopsRouter)
 baseRouter.use('/user', userRouter)
 baseRouter.use('/images', imagesRouter)
 baseRouter.use('/insert', insertRouter)
+baseRouter.use('/bills', billRouter)
 baseRouter.use('/site', siteRouter)
 
 module.exports = baseRouter

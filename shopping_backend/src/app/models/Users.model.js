@@ -13,7 +13,11 @@ const users = new Schema({
     birth: { type: Date },
     address: { type: String, default: 'undefined' },
     avatar: { type: String },
-    cart: { type: Array, default: [] }, //giỏ hàng
+    cart: [{
+        product: { type: Schema.Types.ObjectId, ref: 'products' },
+        quantity: { type: Number },
+        color: { type: String }
+    }], //giỏ hàng
     role: { type: String, default: 'user' }, // phân quyền
     wishlist: [{ type: Schema.Types.ObjectId, ref: 'products' }], //lưu những sản phẩm yêu thích
     isBlocked: { type: Boolean, default: false }, // tài khoản bị khóa hay không

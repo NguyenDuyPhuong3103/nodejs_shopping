@@ -78,7 +78,7 @@ class UserController {
                 const NewRefreshToken = await signRefreshToken(user._id)
 
                 //Lưu NewRefreshToken vào database
-                await User.findByIdAndUpdate(user._id, { NewRefreshToken }, { new: true })
+                await User.findByIdAndUpdate(user._id, { refreshToken: NewRefreshToken }, { new: true })
 
                 //Lưu NewRefreshToken vào cookie ( thời gian hết hạn : 7 ngày)
                 await res.cookie('refreshToken', NewRefreshToken, { httpOnly: true, maxAge: 6 * 30 * 24 * 60 * 60 * 1000 })
@@ -145,7 +145,8 @@ class UserController {
             } else {
                 const newAccessToken = await signAccessToken(user._id, user.role)
                 const newRefreshToken = await signRefreshToken(user._id)
-                await User.findOneAndUpdate({ token: req.cookies }, { token: newRefreshToken }, { new: true })
+
+                await User.findOneAndUpdate({ refreshToken: req.cookies.refreshToken }, { refreshToken: newRefreshToken }, { new: true })
 
                 await res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: 6 * 30 * 24 * 60 * 60 * 1000 })
 
@@ -422,6 +423,51 @@ class UserController {
             }
         }
     }
+
+    //[PUT] /
+    async updateUserCart(req, res, next) {
+        try {
+            const { _id } = req.user
+
+            const { productId, quantity, color } = req.body
+            if (!productId || !quantity || !color) {
+                return res.status(StatusCodes.NOT_FOUND).json(responseFormat(false, {
+                    message: `Thieu du lieu xu ly!!!`,
+                }))
+            }
+
+            const user = await User.findById(_id)
+            const alreadyProduct = user?.cart?.find(el => el.product.toString() === productId)
+            if (alreadyProduct) {
+                if (alreadyProduct.color === color) {
+                    const response = await User.updateOne({ cart: { $elemMatch: alreadyProduct } }, { $set: { "cart.$.quantity": quantity } }, { new: true })
+                    return res.status(StatusCodes.OK).json(responseFormat(true, {
+                        message: `Cap nhat thanh cong cart!!!`
+                    }, response))
+                } else {
+                    const response = await User.findByIdAndUpdate(_id, { $push: { cart: { product: productId, quantity, color } } }, { new: true })
+                    return res.status(StatusCodes.OK).json(responseFormat(true, {
+                        message: `Cap nhat thanh cong cart!!!`
+                    }, response))
+                }
+            } else {
+                const response = await User.findByIdAndUpdate(_id, { $push: { cart: { product: productId, quantity, color } } }, { new: true })
+                return res.status(StatusCodes.OK).json(responseFormat(true, {
+                    message: `Cap nhat thanh cong cart!!!`
+                }, response))
+            }
+        } catch (error) {
+            console.log(error)
+            if (req.file) {
+                cloudinary.uploader.destroy(req.file.filename)
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(responseFormat(false, {
+                    message: `Co loi o server updateShop`,
+                    error: error,
+                }))
+            }
+        }
+    }
+
 }
 
 module.exports = new UserController

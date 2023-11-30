@@ -11,12 +11,10 @@ const { notFound, errHandler } = require('../app/middleware/errorHandler')
 
 const billsController = require('../app/controllers/BillsController')
 
-// router.put('/:id', verifyAccessToken, isAdmin, validate(schemas.billSchema), billsController.updateBillById)
-// router.delete('/:id', verifyAccessToken, isAdmin, billsController.deleteBill)
-// router.post('/', verifyAccessToken, validate(schemas.billSchema), billsController.createBill)
+router.put('/status/:id', verifyAccessToken, isAdmin, billsController.updateStatusBill)
 router.post('/', verifyAccessToken, billsController.createBill)
-// router.get('/:id', billsController.getBillById)
-// router.get('/', billsController.getBills)
+router.get('/admin', verifyAccessToken, isAdmin, billsController.getBills)
+router.get('/', verifyAccessToken, billsController.getUserBill)
 router.use(notFound)
 router.use(errHandler)
 

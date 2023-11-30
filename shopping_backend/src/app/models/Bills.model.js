@@ -3,9 +3,17 @@ const Schema = mongoose.Schema
 
 // Create Categories model
 const bills = new Schema({
-    products: [{ product: { type: mongoose.Types.ObjectId, ref: 'products' }, count: Number, color: String }],
-    status: { type: String, default: 'Processing', enum: ['Cancelled', 'Processing', 'Successed'] },
-    paymentIntent: {},
+    products:
+        [{
+            product: { type: Schema.Types.ObjectId, ref: 'products' },
+            productName: { type: String },
+            productPrice: { type: Number },
+            count: { type: Number },
+            color: { type: String },
+            total: { type: Number }
+        }],
+    status: { type: String, default: 'Processing', enum: ['Cancelled', 'Processing', 'Succeed'] },
+    total: { type: Number },
     orderBy: { type: Schema.Types.ObjectId, ref: 'users' },
 })
 

@@ -6,8 +6,8 @@ const refreshTokens = new Schema({
     token: {
         type: String,
     },
-    user:{
-        type: mongoose.Types.ObjectId,
+    user: {
+        type: Schema.Types.ObjectId,
         ref: "users",
     }
 })

@@ -62,7 +62,6 @@ const verifyAccessToken = async (req, res, next) => {
 
 const verifyRefreshToken = async (refreshToken) => {
     return new Promise((resolve, reject) => {
-        //verify refresh token
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decode) => {
             if (err) reject(err)
             resolve(decode)
